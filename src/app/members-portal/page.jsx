@@ -27,8 +27,10 @@ export default function MembersPage({ children }) {
           const res = await fetch("/api/course-platform/members-quiz-response");
           if (res.ok) {
             const data = await res.json();
-            // Only show passed quizzes that have certificates
-            const passedQuizzes = data.filter(response => response.passed && response.certificateUrl);
+            // Only show passed quizzes that have certificates, sorted by creation date (newest first)
+            const passedQuizzes = data
+              .filter(response => response.passed && response.certificateUrl)
+              .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); // Sort by date, newest first
             setQuizResponses(passedQuizzes);
           } else {
             console.error("Failed to fetch quiz responses:", res.status);

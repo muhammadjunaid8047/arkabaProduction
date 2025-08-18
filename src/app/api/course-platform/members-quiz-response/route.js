@@ -12,11 +12,13 @@ export async function GET(req) {
 
     await connect();
     
-    // Only fetch responses for the authenticated user
+    // Only fetch responses for the authenticated user, sorted by creation date (newest first)
     const responses = await QuizResponse.find({ 
       studentEmail: session.user.email,
       passed: true // Only show passed quizzes
-    }).populate('courseId', 'title description');
+    })
+    .sort({ createdAt: -1 }) // Sort by creation date, newest first
+    .populate('courseId', 'title description');
 
     // Transform the data to include all relevant details
     const formattedResponses = responses.map(response => ({
