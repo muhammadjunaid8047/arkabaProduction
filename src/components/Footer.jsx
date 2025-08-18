@@ -63,7 +63,7 @@ const Footer = () => {
       icon: Award,
       links: [
         { label: "Events", href: "/events" },
-        { label: "Courses", href: "/courses" },
+        // { label: "Courses", href: "/courses" },
       ]
     },
     {
