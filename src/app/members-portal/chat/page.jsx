@@ -344,21 +344,21 @@ export default function ChatRoom() {
                               </AvatarFallback>
                             </Avatar>
                             <div className="flex-1 min-w-0">
-                              <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-1">
-                                <div className="flex items-center gap-2">
-                                <span className="font-semibold text-sm">{msg.user}</span>
-                                {msg.user === 'Anonymous' && (
-                                  <Badge variant="secondary" className="text-xs">
-                                    Anonymous
-                                  </Badge>
-                                )}
+                              <div className="flex flex-col gap-2 mb-2">
+                                <div className="flex flex-wrap items-center gap-2">
+                                  <span className="font-semibold text-sm">{msg.user}</span>
+                                  {msg.user === 'Anonymous' && (
+                                    <Badge variant="secondary" className="text-xs">
+                                      Anonymous
+                                    </Badge>
+                                  )}
                                 </div>
-                                <div className="flex items-center gap-1 text-xs text-muted-foreground sm:ml-auto">
+                                <div className="flex items-center gap-1 text-xs text-muted-foreground">
                                   <Clock className="h-3 w-3" />
                                   {new Date(msg.createdAt).toLocaleString(undefined, {
-                                                  dateStyle: 'medium',
-                                                  timeStyle: 'short',
-                                                })}
+                                    dateStyle: 'medium',
+                                    timeStyle: 'short',
+                                  })}
                                 </div>
                               </div>
                                         {msg.text && (
@@ -369,7 +369,7 @@ export default function ChatRoom() {
                               {msg.fileUrl && (
                                 <div className="mt-3">
                                    <div className="bg-slate-50 rounded-lg p-3 border border-slate-200">
-                                     <div className="flex items-center gap-3">
+                                     <div className="flex flex-col sm:flex-row items-start gap-3">
                                        <div className="flex-shrink-0">
                                   {isImage ? (
                                     <div className="relative inline-block">
@@ -400,15 +400,15 @@ export default function ChatRoom() {
                                         )}
                                       </div>
                                       <div className="flex-1 min-w-0">
-                                        <div className="flex items-center gap-2 mb-1">
-                                          <span className="text-sm font-medium text-slate-700 truncate">
+                                        <div className="flex flex-wrap items-center gap-2 mb-2">
+                                          <span className="text-sm font-medium text-slate-700 break-all">
                                             {msg.fileUrl.split('/').pop() || 'File'}
                                           </span>
                                           <Badge variant="secondary" className="text-xs">
                                             {getFileType(msg.fileUrl)}
                                           </Badge>
                                         </div>
-                                        <div className="flex items-center gap-4 text-xs text-slate-500">
+                                        <div className="flex flex-wrap items-center gap-4 text-xs text-slate-500 mb-3">
                                           <span className="flex items-center gap-1">
                                             <File className="h-3 w-3" />
                                             {getFileType(msg.fileUrl)}
@@ -417,11 +417,11 @@ export default function ChatRoom() {
                                             <span>{formatFileSize(msg.fileSize)}</span>
                                           )}
                                         </div>
-                                        <div className="mt-2 flex gap-2">
+                                        <div className="mt-2 flex flex-col sm:flex-row gap-2">
                                     <Button
                                       variant="outline"
                                       size="sm"
-                                            className="gap-2 bg-white hover:bg-slate-50 text-xs"
+                                      className="gap-2 bg-white hover:bg-slate-50 text-xs w-full sm:w-auto"
                                       onClick={() => window.open(msg.fileUrl, '_blank')}
                                     >
                                             <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -433,7 +433,7 @@ export default function ChatRoom() {
                                           <Button
                                             variant="outline"
                                             size="sm"
-                                            className="gap-2 bg-white hover:bg-slate-50 text-xs"
+                                            className="gap-2 bg-white hover:bg-slate-50 text-xs w-full sm:w-auto"
                                             onClick={() => {
                                               const link = document.createElement('a');
                                               link.href = msg.fileUrl;
@@ -493,7 +493,7 @@ export default function ChatRoom() {
                                 <div className="flex flex-col sm:flex-row gap-2 mt-2">
                                   <Input
                                     placeholder="Write a comment..."
-                                    className="text-sm h-8 flex-1"
+                                    className="text-sm h-8 flex-1 min-w-0"
                                     value={commentInputs[msg._id] || ''}
                                     onChange={(e) =>
                                       setCommentInputs((prev) => ({ ...prev, [msg._id]: e.target.value }))
@@ -504,7 +504,7 @@ export default function ChatRoom() {
                                     size="sm"
                                     onClick={() => postComment(msg._id)}
                                     disabled={!commentInputs[msg._id]?.trim()}
-                                    className="h-8 px-3 flex-shrink-0"
+                                    className="h-8 px-3 flex-shrink-0 w-full sm:w-auto"
                                   >
                                     <Send className="h-3 w-3" />
                                   </Button>
@@ -535,28 +535,28 @@ export default function ChatRoom() {
                   placeholder="Your name"
                   value={anonymous ? '' : session.user.name}
                   disabled
-                    className="w-full text-sm sm:text-base"
+                  className="w-full text-sm sm:text-base"
                 />
               </div>
               <div className="flex items-center gap-2">
-                <label htmlFor="file-upload" className="cursor-pointer">
-                    <Button variant="outline" size="sm" className="gap-2 bg-transparent text-xs sm:text-sm" asChild>
+                <label htmlFor="file-upload" className="cursor-pointer w-full sm:w-auto">
+                  <Button variant="outline" size="sm" className="gap-2 bg-transparent text-xs sm:text-sm w-full sm:w-auto" asChild>
                     <span>
                       <Paperclip className="h-4 w-4" />
-                        <span className="hidden sm:inline">{file ? file.name : 'Attach File'}</span>
-                        <span className="sm:hidden">{file ? file.name.substring(0, 15) + '...' : 'File'}</span>
+                      <span className="hidden sm:inline">{file ? file.name : 'Attach File'}</span>
+                      <span className="sm:hidden">{file ? file.name.substring(0, 15) + '...' : 'File'}</span>
                     </span>
                   </Button>
                 </label>
-                  <input 
-                    id="file-upload" 
-                    type="file" 
-                    onChange={(e) => setFile(e.target.files[0])} 
-                    className="hidden"
-                    accept="image/*,.pdf,.doc,.docx,.txt,.csv,.xls,.xlsx"
-                  />
-                </div>
+                <input 
+                  id="file-upload" 
+                  type="file" 
+                  onChange={(e) => setFile(e.target.files[0])} 
+                  className="hidden"
+                  accept="image/*,.pdf,.doc,.docx,.txt,.csv,.xls,.xlsx"
+                />
               </div>
+            </div>
               {file && (
                 <div className="bg-slate-50 rounded-lg p-3 border border-slate-200">
                   <div className="flex items-center gap-3">
@@ -606,27 +606,27 @@ export default function ChatRoom() {
               onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && sendMessage()}
             />
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div className="flex items-center space-x-2">
-                <Checkbox id="anonymous" checked={anonymous} onCheckedChange={setAnonymous} />
-                <label
-                  htmlFor="anonymous"
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                >
-                  Post as anonymous
-                </label>
-              </div>
-              <Button
-                onClick={sendMessage}
-                disabled={(!message && !file) || isLoading}
+                <div className="flex items-center space-x-2">
+                  <Checkbox id="anonymous" checked={anonymous} onCheckedChange={setAnonymous} />
+                  <label
+                    htmlFor="anonymous"
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    Post as anonymous
+                  </label>
+                </div>
+                <Button
+                  onClick={sendMessage}
+                  disabled={(!message && !file) || isLoading}
                   className="gap-2 min-w-[100px] w-full sm:w-auto"
-              >
-                {isLoading ? (
-                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                ) : (
-                  <Send className="h-4 w-4" />
-                )}
-                {isLoading ? 'Sending...' : 'Send'}
-              </Button>
+                >
+                  {isLoading ? (
+                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                  ) : (
+                    <Send className="h-4 w-4" />
+                  )}
+                  {isLoading ? 'Sending...' : 'Send'}
+                </Button>
               </div>
             </div>
           </CardContent>
