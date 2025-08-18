@@ -453,7 +453,7 @@ export default function Home() {
               whileHover={{ y: -5 }}
               className="group"
             >
-              <Link href="/events" className="block text-center">
+              <Link href="/video" className="block text-center">
                 <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-red-500 to-red-600 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                   <FaBookOpen className="text-white text-2xl" />
                 </div>
