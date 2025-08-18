@@ -1,0 +1,21 @@
+question,option1,option2,option3,option4,correctOption
+What is the correct way to declare a variable in JavaScript?,var,let,const,All of the above,4
+Which company developed JavaScript?,Google,Netscape,Microsoft,Apple,2
+"How do you write ""Hello World"" in an alert box?","msgBox(""Hello World"")","alertBox(""Hello World"")","msg(""Hello World"")","alert(""Hello World"")",4
+What is the output of 2 + '2' in JavaScript?,4,22,"""4""","""22""",4
+Which symbol is used for comments in JavaScript?,//,#,<!-- -->,**,1
+What does 'typeof null' return?,null,object,undefined,string,2
+What keyword is used to define a function in JavaScript?,def,function,func,define,2
+Which array method adds a new element to the end?,push(),pop(),shift(),unshift(),1
+Which loop is guaranteed to run at least once?,for loop,while loop,do...while loop,none,3
+Which operator checks both value and type?,==,=,===,!===,3
+What is the result of NaN === NaN?,true,false,undefined,NaN,2
+How can you convert a string to an integer?,parseString(),parseInt(),stringToInt(),int(),2
+What will `typeof []` return?,object,array,list,undefined,1
+Which keyword is used to exit a loop?,break,return,stop,exit,1
+How do you access the first element of an array?,array[0],array(0),array.first,array.get(0),1
+What is a closure in JavaScript?,A function inside a loop,A function inside a function,A loop inside a function,An array,2
+Which method converts JSON to JavaScript object?,JSON.stringify(),JSON.parse(),parseJSON(),convertJSON(),2
+"What does isNaN(""123"") return?",true,false,null,undefined,2
+Which function is used to delay code execution?,delay(),wait(),setTimeout(),setInterval(),3
+How to write an if statement in JavaScript?,if i = 5,if (i == 5),if i == 5 then,if i := 5,2
