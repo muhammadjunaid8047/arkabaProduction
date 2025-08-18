@@ -5,7 +5,10 @@ import QuizResponse from "@/lib/models/quizResponse";
 export async function GET(req) {
   try {
     await connect();
-    const responses = await QuizResponse.find({}).populate('courseId', 'title description');
+    // Fetch all quiz responses sorted by creation date (newest first)
+    const responses = await QuizResponse.find({})
+      .sort({ createdAt: -1 }) // Sort by creation date, newest first
+      .populate('courseId', 'title description');
 
     // Transform the data to include all relevant details
     const formattedResponses = responses.map(response => ({

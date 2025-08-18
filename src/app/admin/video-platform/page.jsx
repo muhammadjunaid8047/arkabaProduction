@@ -70,7 +70,9 @@ export default function AdminPage() {
   const loadQuizResponses = async () => {
     try {
       const res = await axios.get("/api/course-platform/responses");
-      setQuizResponses(res.data);
+      // Sort by date, newest first (as backup to API sorting)
+      const sortedResponses = res.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      setQuizResponses(sortedResponses);
     } catch (err) {
       console.error("Failed to fetch responses:", err);
     }

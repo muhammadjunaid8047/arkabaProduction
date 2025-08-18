@@ -243,11 +243,15 @@ export default function CourseAdminDashboard() {
 
 
 
-      // Ensure data is an array; if not, set to empty array
+      // Ensure data is an array and sort by creation date (newest first)
 
       const responseData = Array.isArray(data) ? data : [];
 
-      setResponses(responseData);
+      // Sort by date, newest first (as backup to API sorting)
+
+      const sortedResponses = responseData.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+      setResponses(sortedResponses);
 
     } catch (err) {
 
