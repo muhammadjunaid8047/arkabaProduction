@@ -86,8 +86,8 @@ const navigationItems = [
 ];
 
 const memberOnlyItems = [
-  { label: "CEU Library", href: "/ceu", icon: "BookOpen" },
-  { label: "Chat", href: "/chat", icon: "MessageSquare" },
+  { label: "CEU Library", href: "/members-portal/course-platform/courses", icon: "BookOpen" },
+  { label: "Chat", href: "/members-portal/chat", icon: "MessageSquare" },
 ];
 
 // Icon mapping
