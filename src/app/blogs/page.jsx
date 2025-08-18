@@ -4,7 +4,7 @@ import Link from "next/link";
 import BlogImage from "@/components/BlogImage";
 
 async function getBlogs() {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/blogs`, {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'https://emergitechdev.in/'}/api/blogs`, {
     cache: "no-store",
   });
   return res.json();

@@ -11,8 +11,12 @@ export async function GET(req) {
     }
 
     await connect();
-    const responses = await QuizResponse.find({ studentEmail: session.user.email })
-      .populate('courseId', 'title description');
+    
+    // Only fetch responses for the authenticated user
+    const responses = await QuizResponse.find({ 
+      studentEmail: session.user.email,
+      passed: true // Only show passed quizzes
+    }).populate('courseId', 'title description');
 
     // Transform the data to include all relevant details
     const formattedResponses = responses.map(response => ({
@@ -24,7 +28,9 @@ export async function GET(req) {
       total: response.total,
       passed: response.passed,
       certificateUrl: response.certificateUrl,
+      certificateUpdatedAt: response.certificateUpdatedAt,
       createdAt: response.createdAt,
+      updatedAt: response.updatedAt,
       percentage: response.total > 0 ? Math.round((response.score / response.total) * 100) : 0
     }));
 

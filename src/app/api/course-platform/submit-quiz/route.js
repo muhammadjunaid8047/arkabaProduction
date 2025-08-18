@@ -121,39 +121,28 @@ export async function POST(req) {
 
 
     let certificateUrl = null;
-
     if (passed) {
-
       try {
-
-        const fileName = `certificate_${userId}_${courseId}.html`;
-
+        // Always generate a new certificate with current information
+        const timestamp = Date.now();
+        const fileName = `certificate_${userId}_${courseId}_${timestamp}.html`;
         const filePath = path.join(
-
           process.cwd(),
-
           "public",
-
           "certificates",
-
           fileName
-
         );
-
-
 
         await fs.mkdir(path.dirname(filePath), { recursive: true });
 
-
-
-        // Create HTML certificate
+        // Create HTML certificate with current information
         const htmlContent = `
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Learning Continuing Education</title>
+    <title>Continuing Education Certificate - ${course.title}</title>
     <style>
         body {
             font-family: 'Georgia', serif;
@@ -318,6 +307,13 @@ export async function POST(req) {
             position: relative;
             z-index: 2;
         }
+        .certificate-id {
+            position: absolute;
+            bottom: 10px;
+            right: 20px;
+            font-size: 10px;
+            color: #9ca3af;
+        }
     </style>
 </head>
 <body>
@@ -340,8 +336,22 @@ export async function POST(req) {
                         <div class="field-value">${studentName}</div>
                     </div>
                     <div class="field">
+                        <label class="field-label">User Email</label>
+                        <div class="field-value">${session?.user?.email || 'N/A'}</div>
+                    </div>
+                </div>
+                <div class="field-row">
+                    <div class="field">
                         <label class="field-label">BACB Certification Number</label>
-                        <div class="field-value">${course.bacbNumber}</div>
+                        <div class="field-value">${course.bacbNumber || 'N/A'}</div>
+                    </div>
+                    <div class="field">
+                        <label class="field-label">Completion Date</label>
+                        <div class="field-value">${new Date().toLocaleDateString('en-US', { 
+                            year: 'numeric', 
+                            month: 'long', 
+                            day: 'numeric' 
+                        })}</div>
                     </div>
                 </div>
             </div>
@@ -354,12 +364,8 @@ export async function POST(req) {
                 </div>
                 <div class="field-row">
                     <div class="field">
-                        <label class="field-label">Course Date</label>
-                        <div class="field-value">${new Date().toLocaleDateString()}</div>
-                    </div>
-                    <div class="field">
                         <label class="field-label">Content Type</label>
-                        <div class="field-value">${course.contentType}</div>
+                        <div class="field-value">${course.contentType || 'Online Course'}</div>
                     </div>
                     <div class="field">
                         <label class="field-label">Duration</label>
@@ -369,15 +375,15 @@ export async function POST(req) {
                 <div class="field-row">
                     <div class="field">
                         <label class="field-label">Total CEUs</label>
-                        <div class="field-value">${course.totalCEUs}</div>
+                        <div class="field-value">${course.totalCEUs || '0'}</div>
                     </div>
                     <div class="field">
                         <label class="field-label">Ethics CEUs</label>
-                        <div class="field-value">${course.ethicsCEUs}</div>
+                        <div class="field-value">${course.ethicsCEUs || '0'}</div>
                     </div>
                     <div class="field">
                         <label class="field-label">Supervision CEUs</label>
-                        <div class="field-value">${course.supervisionCEUs}</div>
+                        <div class="field-value">${course.supervisionCEUs || '0'}</div>
                     </div>
                 </div>
             </div>
@@ -387,11 +393,11 @@ export async function POST(req) {
                 <div class="field-row">
                     <div class="field">
                         <label class="field-label">Instructor Name</label>
-                        <div class="field-value">${course.instructorName}</div>
+                        <div class="field-value">${course.instructorName || 'N/A'}</div>
                     </div>
                     <div class="field">
                         <label class="field-label">ACE Coordinator</label>
-                        <div class="field-value">${course.coordinatorName}</div>
+                        <div class="field-value">${course.coordinatorName || 'N/A'}</div>
                     </div>
                 </div>
             </div>
@@ -405,7 +411,7 @@ export async function POST(req) {
                     </div>
                     <div class="field">
                         <label class="field-label">Provider Number</label>
-                        <div class="field-value">${course.providerNumber}</div>
+                        <div class="field-value">${course.providerNumber || 'N/A'}</div>
                     </div>
                 </div>
             </div>
@@ -418,7 +424,11 @@ export async function POST(req) {
                     </div>
                     <div class="date-field">
                         <label class="field-label">Date</label>
-                        <div class="field-value">${new Date().toLocaleDateString()}</div>
+                        <div class="field-value">${new Date().toLocaleDateString('en-US', { 
+                            year: 'numeric', 
+                            month: 'long', 
+                            day: 'numeric' 
+                        })}</div>
                     </div>
                 </div>
             </div>
@@ -427,9 +437,16 @@ export async function POST(req) {
                 <div class="score-text">
                     <strong>Quiz Score: ${score}/${course.quiz.length} (${Math.round((score / course.quiz.length) * 100)}%)</strong>
                 </div>
-                <div class="status-badge ${passed ? 'status-passed' : 'status-failed'}">
-                    ${passed ? '✅ PASSED' : '❌ FAILED'}
+                <div class="status-badge status-passed">
+                    ✅ PASSED
                 </div>
+                <p style="margin-top: 15px; font-size: 14px; color: #6b7280;">
+                    This certificate confirms successful completion of the course requirements.
+                </p>
+            </div>
+            
+            <div class="certificate-id">
+                Certificate ID: ${userId}_${courseId}_${timestamp}
             </div>
         </div>
     </div>
@@ -441,6 +458,22 @@ export async function POST(req) {
         await fs.writeFile(filePath, htmlContent, "utf8");
 
         certificateUrl = `/api/certificates/${fileName}`;
+
+        // Clean up old certificates for this user and course (optional)
+        try {
+          const oldCertificates = await fs.readdir(path.join(process.cwd(), "public", "certificates"));
+          const oldCertPattern = new RegExp(`certificate_${userId}_${courseId}_\\d+\\.html`);
+          
+          for (const oldCert of oldCertificates) {
+            if (oldCertPattern.test(oldCert) && oldCert !== fileName) {
+              const oldCertPath = path.join(process.cwd(), "public", "certificates", oldCert);
+              await fs.unlink(oldCertPath);
+              console.log(`Cleaned up old certificate: ${oldCert}`);
+            }
+          }
+        } catch (cleanupError) {
+          console.log("Certificate cleanup failed (non-critical):", cleanupError);
+        }
 
       } catch (certError) {
 
@@ -456,27 +489,38 @@ export async function POST(req) {
 
 
 
-    const response = await QuizResponse.create({
-
-      userId,
-
-      studentEmail: session?.user?.email || null, // Include user's email if logged in
-
-      studentName,
-
+    // Check if there's an existing response for this user and course
+    let existingResponse = await QuizResponse.findOne({ 
+      userId, 
       courseId,
-
-      courseTitle: course.title,
-
-      score,
-
-      total: course.quiz.length,
-
-      passed,
-
-      certificateUrl,
-
+      studentEmail: session?.user?.email || null 
     });
+
+    let response;
+    if (existingResponse) {
+      // Update existing response with new score and certificate
+      existingResponse.score = score;
+      existingResponse.total = course.quiz.length;
+      existingResponse.passed = passed;
+      existingResponse.certificateUrl = certificateUrl;
+      existingResponse.certificateUpdatedAt = new Date();
+      existingResponse.updatedAt = new Date();
+      response = await existingResponse.save();
+    } else {
+      // Create new response
+      response = await QuizResponse.create({
+        userId,
+        studentEmail: session?.user?.email || null, // Include user's email if logged in
+        studentName,
+        courseId,
+        courseTitle: course.title,
+        score,
+        total: course.quiz.length,
+        passed,
+        certificateUrl,
+        certificateUpdatedAt: new Date(),
+      });
+    }
 
 
 

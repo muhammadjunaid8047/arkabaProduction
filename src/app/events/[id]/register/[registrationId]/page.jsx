@@ -193,11 +193,7 @@ export default function EventRegistrationPage({ params }) {
   };
 
   const handleInputChange = (field, value) => {
-    // Prevent name and email changes when user is signed in
-    if ((field === 'email' || field === 'firstName' || field === 'lastName') && session?.user) {
-      return;
-    }
-    
+    // Allow all fields to be editable for all users
     setRegistrationData(prev => ({
       ...prev,
       [field]: value
@@ -410,14 +406,14 @@ export default function EventRegistrationPage({ params }) {
                 </Elements>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-6">
-                  {/* Security Notice for Signed-in Users */}
+                  {/* Information Notice for Signed-in Users */}
                   {session?.user && (
                     <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                       <div className="flex items-center gap-2">
-                        <Lock className="h-4 w-4 text-blue-600" />
+                        <User className="h-4 w-4 text-blue-600" />
                         <p className="text-sm text-blue-700">
-                          <strong>Security Notice:</strong> Your account information (name and email) is locked to prevent unauthorized registrations. 
-                          You can only register for yourself using this account.
+                          <strong>Note:</strong> You can edit your name and contact information for this registration. 
+                          Your account email will be used for confirmation.
                         </p>
                       </div>
                     </div>
@@ -434,16 +430,8 @@ export default function EventRegistrationPage({ params }) {
                         required
                         value={registrationData.firstName}
                         onChange={(e) => handleInputChange('firstName', e.target.value)}
-                        readOnly={!!session?.user}
-                        className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-red-500 focus:border-red-500 ${
-                          session?.user ? 'bg-gray-100 cursor-not-allowed' : ''
-                        }`}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-red-500 focus:border-red-500"
                       />
-                      {session?.user && (
-                        <p className="text-xs text-gray-500 mt-1">
-                          Locked to your account
-                        </p>
-                      )}
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -454,16 +442,8 @@ export default function EventRegistrationPage({ params }) {
                         required
                         value={registrationData.lastName}
                         onChange={(e) => handleInputChange('lastName', e.target.value)}
-                        readOnly={!!session?.user}
-                        className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-red-500 focus:border-red-500 ${
-                          session?.user ? 'bg-gray-100 cursor-not-allowed' : ''
-                        }`}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-red-500 focus:border-red-500"
                       />
-                      {session?.user && (
-                        <p className="text-xs text-gray-500 mt-1">
-                          Locked to your account
-                        </p>
-                      )}
                     </div>
                   </div>
 
@@ -476,16 +456,8 @@ export default function EventRegistrationPage({ params }) {
                       required
                       value={registrationData.email}
                       onChange={(e) => handleInputChange('email', e.target.value)}
-                      readOnly={!!session?.user}
-                      className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-red-500 focus:border-red-500 ${
-                        session?.user ? 'bg-gray-100 cursor-not-allowed' : ''
-                      }`}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-red-500 focus:border-red-500"
                     />
-                    {session?.user && (
-                      <p className="text-xs text-gray-500 mt-1">
-                        Email is locked to your account for security
-                      </p>
-                    )}
                   </div>
 
                   <div>
