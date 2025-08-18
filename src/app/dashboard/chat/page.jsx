@@ -61,41 +61,42 @@ export default function ChatPage() {
      
 
       <div className="space-y-4">
-        {[...messages].reverse().map((msg) => (
-          <div key={msg._id} className="border p-4 rounded shadow flex justify-between items-start">
-            <div className="flex-1">
-              <p className="text-xs text-gray-400">
-                <span className="font-medium text-gray-800">
-                  {msg.fullName || 'Anonymous'}
-                </span>{' '}
-                • {msg.email || 'No Email'} •{' '}
-                {new Date(msg.createdAt).toLocaleString()}
-              </p>
-              {editId === msg._id ? (
-                <Textarea
-                  value={editData.text}
-                  onChange={(e) => setEditData({ ...editData, text: e.target.value })}
-                  className="mt-2"
-                />
-              ) : (
-                <p className="text-sm mt-2">{msg.text}</p>
-              )}
-            </div>
-            <div className="ml-4 space-x-2">
-              {editId === msg._id ? (
-                <Button size="sm" onClick={handleSave}>
-                  Save
+                {[...messages].reverse().map((msg) => (
+          <div key={msg._id} className="border p-4 rounded shadow">
+            <div className="flex justify-between items-start gap-4">
+              <div className="flex-1 min-w-0">
+                <p className="text-xs text-gray-400 mb-2">
+                  <span className="font-medium text-gray-800">
+                    {msg.fullName || 'Anonymous'}
+                  </span>{' '}
+                  • {msg.email || 'No Email'} •{' '}
+                  {new Date(msg.createdAt).toLocaleString()}
+                </p>
+                {editId === msg._id ? (
+                  <Textarea
+                    value={editData.text}
+                    onChange={(e) => setEditData({ ...editData, text: e.target.value })}
+                    className="mt-2 w-full"
+                  />
+                ) : (
+                  <p className="text-sm mt-2 break-words whitespace-pre-wrap overflow-hidden text-gray-700 leading-relaxed">{msg.text}</p>
+                )}
+              </div>
+              <div className="flex-shrink-0 space-x-2">
+                {editId === msg._id ? (
+                  <Button size="sm" onClick={handleSave}>
+                    Save
+                  </Button>
+                ) : (
+                  <Button size="sm" variant="outline" onClick={() => handleEdit(msg)}>
+                    Edit
+                  </Button>
+                )}
+                <Button size="sm" variant="destructive" onClick={() => handleDelete(msg._id)}>
+                  Delete
                 </Button>
-              ) : (
-                <Button size="sm" variant="outline" onClick={() => handleEdit(msg)}>
-                  Edit
-                </Button>
-              )}
-              <Button size="sm" variant="destructive" onClick={() => handleDelete(msg._id)}>
-                Delete
-              </Button>
+              </div>
             </div>
-            
           </div>
           
         ))}
