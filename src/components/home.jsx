@@ -901,9 +901,7 @@ export default function Home() {
                       e.target.src = "/images/event-2.jpg";
                     }}
                   />
-                    <div className="absolute top-4 right-4 bg-red-600 text-white px-3 py-1 rounded-full text-sm font-semibold">
-                      {event.ceus || "3"} CEUs
-                    </div>
+
                   </div>
                   <div className="p-6">
                     <h3 className="text-xl font-bold text-gray-800 mb-3 line-clamp-2">
