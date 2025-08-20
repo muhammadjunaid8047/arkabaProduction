@@ -116,13 +116,29 @@ function QuickActions() {
 }
 
 // Recent Activity Component
-function RecentActivity() {
-  const activities = [
-    { action: "New member joined", time: "2 minutes ago", icon: UserPlus, color: "text-green-600" },
-    { action: "Job posting published", time: "1 hour ago", icon: Briefcase, color: "text-blue-600" },
-    { action: "New message received", time: "3 hours ago", icon: MessageSquare, color: "text-purple-600" },
-    { action: "Event scheduled", time: "5 hours ago", icon: Calendar, color: "text-orange-600" },
+function RecentActivity({ activities }) {
+  // Define icons and colors for different activity types
+  const getActivityDisplay = (activity) => {
+    switch (activity.type) {
+      case 'member':
+        return { icon: UserPlus, color: "text-green-600" };
+      case 'job':
+        return { icon: Briefcase, color: "text-blue-600" };
+      case 'message':
+        return { icon: MessageSquare, color: "text-purple-600" };
+      case 'event':
+        return { icon: Calendar, color: "text-orange-600" };
+      default:
+        return { icon: Activity, color: "text-gray-600" };
+    }
+  };
+
+  // Fallback activities if no real data is available
+  const fallbackActivities = [
+    { action: "No recent activity", time: "Check back later", type: 'default' }
   ];
+
+  const displayActivities = activities && activities.length > 0 ? activities : fallbackActivities;
 
   return (
     <Card className="bg-white border-0 shadow-md">
@@ -135,17 +151,20 @@ function RecentActivity() {
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          {activities.map((activity, index) => (
-            <div key={index} className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors">
-              <div className={`p-2 rounded-full bg-gray-100 ${activity.color}`}>
-                <activity.icon className="h-4 w-4" />
+          {displayActivities.map((activity, index) => {
+            const { icon: Icon, color } = getActivityDisplay(activity);
+            return (
+              <div key={index} className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors">
+                <div className={`p-2 rounded-full bg-gray-100 ${color}`}>
+                  <Icon className="h-4 w-4" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-gray-900">{activity.action}</p>
+                  <p className="text-xs text-gray-500">{activity.time}</p>
+                </div>
               </div>
-              <div className="flex-1">
-                <p className="text-sm font-medium text-gray-900">{activity.action}</p>
-                <p className="text-xs text-gray-500">{activity.time}</p>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </CardContent>
     </Card>
@@ -161,6 +180,13 @@ export default function DashboardPage() {
     totalMembers: 0,
     signupsToday: 0,
     signupsThisWeek: 0,
+    trends: {
+      jobs: 0,
+      messagesToday: 0,
+      messagesWeek: 0,
+      signupsWeek: 0
+    },
+    recentActivities: []
   })
 
   const [loading, setLoading] = useState(true);
@@ -215,10 +241,10 @@ export default function DashboardPage() {
           title="Total Jobs" 
           value={stats.totalJobs} 
           icon={Briefcase} 
-          description="Active job postings"
+          description=" Total job postings"
           bgGradient="from-blue-50 to-blue-100"
-          trend="up"
-          trendValue="12"
+          trend={stats.trends.jobs >= 0 ? "up" : "down"}
+          trendValue={Math.abs(stats.trends.jobs)}
         />
         <DashboardCard 
           title="Total Messages" 
@@ -226,8 +252,8 @@ export default function DashboardPage() {
           icon={MessageSquare} 
           description="Community messages"
           bgGradient="from-purple-50 to-purple-100"
-          trend="up"
-          trendValue="8"
+          trend={stats.trends.messagesWeek >= 0 ? "up" : "down"}
+          trendValue={Math.abs(stats.trends.messagesWeek)}
         />
         <DashboardCard 
           title="Messages Today" 
@@ -235,8 +261,8 @@ export default function DashboardPage() {
           icon={TrendingUp} 
           description="Today's activity"
           bgGradient="from-green-50 to-green-100"
-          trend="up"
-          trendValue="25"
+          trend={stats.trends.messagesToday >= 0 ? "up" : "down"}
+          trendValue={Math.abs(stats.trends.messagesToday)}
         />
         <DashboardCard 
           title="Messages This Week" 
@@ -244,8 +270,8 @@ export default function DashboardPage() {
           icon={Activity} 
           description="Weekly engagement"
           bgGradient="from-orange-50 to-orange-100"
-          trend="up"
-          trendValue="15"
+          trend={stats.trends.messagesWeek >= 0 ? "up" : "down"}
+          trendValue={Math.abs(stats.trends.messagesWeek)}
         />
       </div>
 
@@ -257,8 +283,8 @@ export default function DashboardPage() {
           icon={Users} 
           description="Registered community members"
           bgGradient="from-indigo-50 to-indigo-100"
-          trend="up"
-          trendValue="5"
+          trend={stats.trends.signupsWeek >= 0 ? "up" : "down"}
+          trendValue={Math.abs(stats.trends.signupsWeek)}
         />
         <DashboardCard 
           title="Signups Today" 
@@ -266,8 +292,8 @@ export default function DashboardPage() {
           icon={UserPlus} 
           description="New registrations today"
           bgGradient="from-teal-50 to-teal-100"
-          trend="up"
-          trendValue="20"
+          trend={stats.signupsToday > 0 ? "up" : "down"}
+          trendValue={stats.signupsToday}
         />
         <DashboardCard 
           title="Signups This Week" 
@@ -275,8 +301,8 @@ export default function DashboardPage() {
           icon={TrendingUp} 
           description="Weekly new members"
           bgGradient="from-pink-50 to-pink-100"
-          trend="up"
-          trendValue="18"
+          trend={stats.trends.signupsWeek >= 0 ? "up" : "down"}
+          trendValue={Math.abs(stats.trends.signupsWeek)}
         />
       </div>
 
@@ -364,7 +390,7 @@ export default function DashboardPage() {
       {/* Action Cards Grid */}
       <div className="grid gap-4 lg:grid-cols-2">
         <QuickActions />
-        <RecentActivity />
+        <RecentActivity activities={stats.recentActivities} />
       </div>
 
       {/* Loading State */}
