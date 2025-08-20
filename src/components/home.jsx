@@ -82,13 +82,26 @@ function Counter({ from, to, suffix = "", duration = 2, delay = 0 }) {
   );
 }
 
-// Utility function to limit text to specified words
+// Utility function to limit text to specified words and strip markdown formatting
 function truncateWords(text, limit) {
   if (!text) return "";
-  const words = text.split(" ");
+  
+  // Strip markdown formatting
+  let cleanText = text
+    // Remove bold formatting (**text**)
+    .replace(/\*\*(.*?)\*\*/g, '$1')
+    // Remove italic formatting (*text*)
+    .replace(/\*(.*?)\*/g, '$1')
+    // Remove headers (# ## ###)
+    .replace(/^#{1,6}\s+/gm, '')
+    // Remove other common markdown elements if needed
+    .replace(/`(.*?)`/g, '$1') // Remove code formatting
+    .trim();
+  
+  const words = cleanText.split(" ");
   return words.length > limit
     ? words.slice(0, limit).join(" ") + "..."
-    : text;
+    : cleanText;
 }
 
 export default function Home() {
