@@ -11,10 +11,58 @@ const transporter = nodemailer.createTransport({
 
 export const sendEventRegistrationConfirmation = async (registration) => {
   try {
-    const eventTitle = registration.eventRegistrationId?.title || 'Event Registration';
-    const eventDate = registration.eventRegistrationId?.eventId?.date ? 
-      new Date(registration.eventRegistrationId.eventId.date).toLocaleDateString() : 'TBD';
-    const eventLocation = registration.eventRegistrationId?.eventId?.location || 'TBD';
+    // Import models at function level to avoid circular dependency issues
+    const { connect } = await import("@/lib/mongodb/mongoose");
+    const EventRegistration = (await import("@/lib/models/eventRegistration")).default;
+    const Event = (await import("@/lib/models/event")).default;
+    
+    await connect();
+    
+    // Populate the registration with event data
+    const populatedRegistration = await registration.populate([
+      {
+        path: 'eventRegistrationId',
+        populate: {
+          path: 'eventId',
+          select: 'title date location'
+        }
+      }
+    ]);
+    
+    // Get event data from populated registration or fetch directly if not available
+    let eventTitle = 'Event Registration';
+    let eventDate = 'TBD';
+    let eventLocation = 'TBD';
+    
+    if (populatedRegistration.eventRegistrationId) {
+      eventTitle = populatedRegistration.eventRegistrationId.title || 'Event Registration';
+      
+      if (populatedRegistration.eventRegistrationId.eventId) {
+        const eventData = populatedRegistration.eventRegistrationId.eventId;
+        eventDate = eventData.date ? new Date(eventData.date).toLocaleDateString() : 'TBD';
+        eventLocation = eventData.location || 'TBD';
+      }
+    }
+    
+    // If population failed, try to fetch the data directly
+    if (eventDate === 'TBD' || eventLocation === 'TBD') {
+      try {
+        const eventRegistration = await EventRegistration.findById(registration.eventRegistrationId)
+          .populate('eventId', 'title date location');
+        
+        if (eventRegistration) {
+          eventTitle = eventRegistration.title || eventTitle;
+          
+          if (eventRegistration.eventId) {
+            eventDate = eventRegistration.eventId.date ? 
+              new Date(eventRegistration.eventId.date).toLocaleDateString() : eventDate;
+            eventLocation = eventRegistration.eventId.location || eventLocation;
+          }
+        }
+      } catch (fetchError) {
+        console.error("Error fetching event data for email:", fetchError);
+      }
+    }
     
     const subject = `Event Registration Confirmation - ${eventTitle}`;
     
@@ -295,10 +343,57 @@ The ArkABA Team
 
 export const sendEventRegistrationReminder = async (registration) => {
   try {
-    const eventTitle = registration.eventRegistrationId?.title || 'Event Registration';
-    const eventDate = registration.eventRegistrationId?.eventId?.date ? 
-      new Date(registration.eventRegistrationId.eventId.date).toLocaleDateString() : 'TBD';
-    const eventLocation = registration.eventRegistrationId?.eventId?.location || 'TBD';
+    // Import models at function level to avoid circular dependency issues
+    const { connect } = await import("@/lib/mongodb/mongoose");
+    const EventRegistration = (await import("@/lib/models/eventRegistration")).default;
+    
+    await connect();
+    
+    // Populate the registration with event data
+    const populatedRegistration = await registration.populate([
+      {
+        path: 'eventRegistrationId',
+        populate: {
+          path: 'eventId',
+          select: 'title date location'
+        }
+      }
+    ]);
+    
+    // Get event data from populated registration or fetch directly if not available
+    let eventTitle = 'Event Registration';
+    let eventDate = 'TBD';
+    let eventLocation = 'TBD';
+    
+    if (populatedRegistration.eventRegistrationId) {
+      eventTitle = populatedRegistration.eventRegistrationId.title || 'Event Registration';
+      
+      if (populatedRegistration.eventRegistrationId.eventId) {
+        const eventData = populatedRegistration.eventRegistrationId.eventId;
+        eventDate = eventData.date ? new Date(eventData.date).toLocaleDateString() : 'TBD';
+        eventLocation = eventData.location || 'TBD';
+      }
+    }
+    
+    // If population failed, try to fetch the data directly
+    if (eventDate === 'TBD' || eventLocation === 'TBD') {
+      try {
+        const eventRegistration = await EventRegistration.findById(registration.eventRegistrationId)
+          .populate('eventId', 'title date location');
+        
+        if (eventRegistration) {
+          eventTitle = eventRegistration.title || eventTitle;
+          
+          if (eventRegistration.eventId) {
+            eventDate = eventRegistration.eventId.date ? 
+              new Date(eventRegistration.eventId.date).toLocaleDateString() : eventDate;
+            eventLocation = eventRegistration.eventId.location || eventLocation;
+          }
+        }
+      } catch (fetchError) {
+        console.error("Error fetching event data for reminder email:", fetchError);
+      }
+    }
     
     const subject = `Event Reminder - ${eventTitle} - Tomorrow!`;
     
