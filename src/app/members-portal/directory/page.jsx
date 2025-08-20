@@ -243,7 +243,7 @@ export default function DirectoryPage() {
               }`}
             >
               <Award className="h-4 w-4 sm:h-5 sm:w-5" />
-              Other
+              Supervisors
             </button>
           </nav>
         </div>

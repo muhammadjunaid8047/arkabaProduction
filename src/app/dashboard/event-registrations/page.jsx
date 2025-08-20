@@ -15,7 +15,10 @@ import {
   XCircle,
   AlertCircle,
   Receipt,
-  Mail
+  Mail,
+  ChevronDown,
+  ChevronUp,
+  Loader2
 } from "lucide-react";
 import Link from "next/link";
 
@@ -26,6 +29,7 @@ export default function EventRegistrationsManagement() {
   const [error, setError] = useState("");
   const [attendees, setAttendees] = useState({});
   const [showAttendees, setShowAttendees] = useState({});
+  const [loadingAttendees, setLoadingAttendees] = useState({});
 
   useEffect(() => {
     fetchData();
@@ -87,7 +91,15 @@ export default function EventRegistrationsManagement() {
       return;
     }
 
+    // If attendees are already loaded, just show them
+    if (attendees[registrationId]) {
+      setShowAttendees(prev => ({ ...prev, [registrationId]: true }));
+      return;
+    }
+
     try {
+      setLoadingAttendees(prev => ({ ...prev, [registrationId]: true }));
+      
       const response = await fetch(`/api/admin/event-registrations/${registrationId}/attendees`);
       const result = await response.json();
       
@@ -99,6 +111,8 @@ export default function EventRegistrationsManagement() {
       }
     } catch (error) {
       setError("Failed to fetch attendees");
+    } finally {
+      setLoadingAttendees(prev => ({ ...prev, [registrationId]: false }));
     }
   };
 
@@ -148,19 +162,19 @@ export default function EventRegistrationsManagement() {
           <p className="text-gray-600">Manage event registration pages and pricing</p>
         </div>
         
-        <div className="flex flex-col sm:flex-row gap-2">
+        <div className="flex flex-row gap-2 px-4 sm:px-0 sm:w-auto">
           <Link
             href="/dashboard/event-registrations/create"
-            className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors flex items-center gap-2"
+            className="bg-red-600 text-white px-[25px] py-3 sm:py-2 rounded-lg hover:bg-red-700 transition-colors flex items-center justify-center gap-2 text-center min-h-[44px] flex-1 sm:flex-none sm:w-auto"
           >
-            <Plus className="h-4 w-4" />
-            Create Registration
+            <Plus className="h-4 w-4 flex-shrink-0" />
+            <span>Create Registration</span>
           </Link>
           <Link
             href="/dashboard/event-management"
-            className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors"
+            className="bg-gray-600 text-white px-[25px] py-3 sm:py-2 rounded-lg hover:bg-gray-700 transition-colors flex items-center justify-center gap-2 text-center min-h-[44px] flex-1 sm:flex-none sm:w-auto"
           >
-            Manage Events
+            <span>Manage Events</span>
           </Link>
         </div>
       </div>
@@ -180,18 +194,19 @@ export default function EventRegistrationsManagement() {
           <h3 className="font-semibold text-blue-900 mb-2">Events without registration:</h3>
           <div className="grid gap-2">
             {getEventWithoutRegistration().map(event => (
-              <div key={event._id} className="flex items-center justify-between bg-white p-3 rounded border">
-                <div>
-                  <h4 className="font-medium">{event.title}</h4>
-                  <p className="text-sm text-gray-600">
+              <div key={event._id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-white p-4 rounded border">
+                <div className="flex-1">
+                  <h4 className="font-medium text-gray-900 break-words">{event.title}</h4>
+                  <p className="text-sm text-gray-600 mt-1">
                     {new Date(event.date).toLocaleDateString()}
                   </p>
                 </div>
                 <Link
                   href={`/dashboard/event-registrations/create?eventId=${event._id}`}
-                  className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 transition-colors"
+                  className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 min-h-[44px] w-full sm:w-auto sm:min-w-[160px]"
                 >
-                  Create Registration
+                  <Plus className="h-4 w-4 flex-shrink-0" />
+                  <span>Create Registration</span>
                 </Link>
               </div>
             ))}
@@ -225,13 +240,13 @@ export default function EventRegistrationsManagement() {
               className="bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden"
             >
               <div className="p-6">
-                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
                   <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-2">
                       <h3 className="text-xl font-semibold text-gray-900">
                         {registration.title}
                       </h3>
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                      <span className={`self-start px-2 py-1 rounded-full text-xs font-medium ${
                         registration.isActive
                           ? 'bg-green-100 text-green-800'
                           : 'bg-red-100 text-red-800'
@@ -240,11 +255,11 @@ export default function EventRegistrationsManagement() {
                       </span>
                     </div>
                     
-                    <p className="text-gray-600 mb-3">{registration.description}</p>
+                    <p className="text-gray-600 mb-4">{registration.description}</p>
                     
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
                       <div className="flex items-center gap-2">
-                        <Calendar className="h-4 w-4 text-gray-400" />
+                        <Calendar className="h-4 w-4 text-gray-400 flex-shrink-0" />
                         <div>
                           <p className="font-medium">Event Date</p>
                           <p className="text-gray-600">
@@ -254,7 +269,7 @@ export default function EventRegistrationsManagement() {
                       </div>
                       
                       <div className="flex items-center gap-2">
-                        <Clock className="h-4 w-4 text-gray-400" />
+                        <Clock className="h-4 w-4 text-gray-400 flex-shrink-0" />
                         <div>
                           <p className="font-medium">Registration Deadline</p>
                           <p className="text-gray-600">
@@ -264,7 +279,7 @@ export default function EventRegistrationsManagement() {
                       </div>
                       
                       <div className="flex items-center gap-2">
-                        <Users className="h-4 w-4 text-gray-400" />
+                        <Users className="h-4 w-4 text-gray-400 flex-shrink-0" />
                         <div>
                           <p className="font-medium">Attendees</p>
                           <p className="text-gray-600">
@@ -275,7 +290,7 @@ export default function EventRegistrationsManagement() {
                       </div>
                       
                       <div className="flex items-center gap-2">
-                        <DollarSign className="h-4 w-4 text-gray-400" />
+                        <DollarSign className="h-4 w-4 text-gray-400 flex-shrink-0" />
                         <div>
                           <p className="font-medium">Pricing Range</p>
                           <p className="text-gray-600">
@@ -287,47 +302,85 @@ export default function EventRegistrationsManagement() {
                     </div>
                   </div>
                   
-                  <div className="flex flex-col gap-2 lg:w-48">
-                    <Link
-                      href={`/events/${registration.eventId?._id}/register/${registration._id}`}
-                      target="_blank"
-                      className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 justify-center"
-                    >
-                      <Eye className="h-4 w-4" />
-                      View Page
-                    </Link>
+                  {/* Action buttons - mobile optimized */}
+                  <div className="w-full lg:w-auto lg:min-w-[200px]">
+                    {/* Primary actions - mobile grid layout */}
+                    <div className="grid grid-cols-2 lg:grid-cols-1 gap-2 lg:gap-2">
+                      <Link
+                        href={`/events/${registration.eventId?._id}/register/${registration._id}`}
+                        target="_blank"
+                        className="bg-blue-600 text-white px-3 py-2 lg:px-4 lg:py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 justify-center text-sm lg:text-base min-h-[44px]"
+                      >
+                        <Eye className="h-4 w-4 flex-shrink-0" />
+                        <span className="hidden sm:inline lg:inline">View Page</span>
+                        <span className="sm:hidden lg:hidden">View</span>
+                      </Link>
+                      
+                      <button
+                        onClick={() => toggleAttendees(registration._id)}
+                        disabled={loadingAttendees[registration._id]}
+                        className={`${
+                          showAttendees[registration._id] 
+                            ? 'bg-green-700 hover:bg-green-800' 
+                            : 'bg-green-600 hover:bg-green-700'
+                        } text-white px-3 py-2 lg:px-4 lg:py-2 rounded-lg transition-all duration-200 flex items-center gap-2 justify-center text-sm lg:text-base min-h-[44px] disabled:opacity-50 disabled:cursor-not-allowed`}
+                      >
+                        {loadingAttendees[registration._id] ? (
+                          <Loader2 className="h-4 w-4 flex-shrink-0 animate-spin" />
+                        ) : showAttendees[registration._id] ? (
+                          <ChevronUp className="h-4 w-4 flex-shrink-0" />
+                        ) : (
+                          <Users className="h-4 w-4 flex-shrink-0" />
+                        )}
+                        <span className="hidden sm:inline lg:inline">
+                          {loadingAttendees[registration._id] 
+                            ? 'Loading...'
+                            : showAttendees[registration._id] 
+                              ? 'Hide Attendees' 
+                              : 'View Attendees'
+                          }
+                        </span>
+                        <span className="sm:hidden lg:hidden">
+                          {loadingAttendees[registration._id] 
+                            ? 'Loading'
+                            : showAttendees[registration._id] 
+                              ? 'Hide' 
+                              : 'Attendees'
+                          }
+                        </span>
+                        {!loadingAttendees[registration._id] && !showAttendees[registration._id] && (
+                          <ChevronDown className="h-4 w-4 flex-shrink-0 ml-1" />
+                        )}
+                      </button>
+                      
+                      <button
+                        onClick={() => sendReminders(registration._id, registration.eventId?.date)}
+                        className="bg-yellow-600 text-white px-3 py-2 lg:px-4 lg:py-2 rounded-lg hover:bg-yellow-700 transition-colors flex items-center gap-2 justify-center text-sm lg:text-base min-h-[44px]"
+                      >
+                        <Mail className="h-4 w-4 flex-shrink-0" />
+                        <span className="hidden sm:inline lg:inline">Send Reminders</span>
+                        <span className="sm:hidden lg:hidden">Remind</span>
+                      </button>
+                      
+                      <Link
+                        href={`/dashboard/event-registrations/edit/${registration._id}`}
+                        className="bg-gray-600 text-white px-3 py-2 lg:px-4 lg:py-2 rounded-lg hover:bg-gray-700 transition-colors flex items-center gap-2 justify-center text-sm lg:text-base min-h-[44px]"
+                      >
+                        <Edit className="h-4 w-4 flex-shrink-0" />
+                        <span>Edit</span>
+                      </Link>
+                    </div>
                     
-                    <button
-                      onClick={() => toggleAttendees(registration._id)}
-                      className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2 justify-center"
-                    >
-                      <Users className="h-4 w-4" />
-                      View Attendees
-                    </button>
-                    
-                    <button
-                      onClick={() => sendReminders(registration._id, registration.eventId?.date)}
-                      className="bg-yellow-600 text-white px-4 py-2 rounded-lg hover:bg-yellow-700 transition-colors flex items-center gap-2 justify-center"
-                    >
-                      <Mail className="h-4 w-4" />
-                      Send Reminders
-                    </button>
-                    
-                    <Link
-                      href={`/dashboard/event-registrations/edit/${registration._id}`}
-                      className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors flex items-center gap-2 justify-center"
-                    >
-                      <Edit className="h-4 w-4" />
-                      Edit
-                    </Link>
-                    
-                    <button
-                      onClick={() => deleteRegistration(registration._id)}
-                      className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors flex items-center gap-2 justify-center"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                      Delete
-                    </button>
+                    {/* Destructive action - separate row on mobile */}
+                    <div className="mt-2">
+                      <button
+                        onClick={() => deleteRegistration(registration._id)}
+                        className="w-full bg-red-600 text-white px-3 py-2 lg:px-4 lg:py-2 rounded-lg hover:bg-red-700 transition-colors flex items-center gap-2 justify-center text-sm lg:text-base min-h-[44px]"
+                      >
+                        <Trash2 className="h-4 w-4 flex-shrink-0" />
+                        <span>Delete</span>
+                      </button>
+                    </div>
                   </div>
                 </div>
                 
@@ -362,27 +415,63 @@ export default function EventRegistrationsManagement() {
                   )}
                 </div>
 
-                {/* Attendees Section */}
+                {/* Attendees Section with Animation */}
                 {showAttendees[registration._id] && (
-                  <div className="mt-6 pt-6 border-t border-gray-200">
-                    <h4 className="font-semibold text-gray-700 mb-4">Registered Attendees:</h4>
-                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
+                  <motion.div 
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.3, ease: "easeInOut" }}
+                    className="mt-6 pt-6 border-t border-gray-200 overflow-hidden"
+                  >
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
+                      <h4 className="font-semibold text-gray-700">Registered Attendees:</h4>
+                      {attendees[registration._id] && (
+                        <span className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
+                          {attendees[registration._id].length} attendee{attendees[registration._id].length !== 1 ? 's' : ''}
+                        </span>
+                      )}
+                    </div>
+                    
+                    <motion.div 
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.3, delay: 0.1 }}
+                      className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4"
+                    >
                       <p className="text-sm text-blue-700">
                         <strong>Note:</strong> All registrations are automatically completed. Payment status shows the final state.
                       </p>
-                    </div>
+                    </motion.div>
+                    
                     {attendees[registration._id] && attendees[registration._id].length > 0 ? (
-                      <div className="bg-gray-50 rounded-lg p-4">
+                      <motion.div 
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.3, delay: 0.2 }}
+                        className="bg-gray-50 rounded-lg p-4"
+                      >
                         <div className="grid gap-3">
                           {attendees[registration._id].map((attendee, index) => (
-                            <div key={attendee._id || index} className="flex items-center justify-between bg-white p-3 rounded border">
-                              <div className="flex-1">
-                                <div className="flex items-center gap-3">
-                                  <span className="font-medium">
-                                    {attendee.firstName} {attendee.lastName}
-                                  </span>
-                                  <span className="text-sm text-gray-500">{attendee.email}</span>
-                                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                            <motion.div 
+                              key={attendee._id || index}
+                              initial={{ opacity: 0, x: -10 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              transition={{ duration: 0.2, delay: 0.1 * index }}
+                              className="bg-white p-4 rounded border hover:shadow-md transition-shadow duration-200"
+                            >
+                              <div className="flex flex-col gap-3">
+                                {/* Name and status row */}
+                                <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                                  <div className="flex-1">
+                                    <span className="font-medium text-gray-900 break-words">
+                                      {attendee.firstName} {attendee.lastName}
+                                    </span>
+                                    <p className="text-sm text-gray-500 break-all mt-1 sm:mt-0 sm:ml-3 sm:inline">
+                                      {attendee.email}
+                                    </p>
+                                  </div>
+                                  <span className={`self-start px-2 py-1 rounded-full text-xs font-medium ${
                                     attendee.paymentStatus === 'completed' 
                                       ? 'bg-green-100 text-green-800' 
                                       : 'bg-red-100 text-red-800'
@@ -390,34 +479,53 @@ export default function EventRegistrationsManagement() {
                                     {attendee.paymentStatus === 'completed' ? 'Confirmed' : 'Failed'}
                                   </span>
                                 </div>
-                                <div className="text-sm text-gray-600 mt-1">
-                                  Role: {attendee.membershipRole ? 
-                                    (attendee.membershipRole === 'nonMember' ? 'Non-Member' : `${attendee.membershipRole} Member`) :
-                                    (attendee.userRole === 'nonMember' ? 'Non-Member' : `${attendee.userRole} Member`)
-                                  } • Amount: ${attendee.amountPaid} • 
-                                  Registered: {new Date(attendee.registeredAt).toLocaleDateString()}
+                                
+                                {/* Details row */}
+                                <div className="text-sm text-gray-600">
+                                  <div className="flex flex-wrap gap-x-4 gap-y-1">
+                                    <span>
+                                      <span className="font-medium">Role:</span> {attendee.membershipRole ? 
+                                        (attendee.membershipRole === 'nonMember' ? 'Non-Member' : `${attendee.membershipRole} Member`) :
+                                        (attendee.userRole === 'nonMember' ? 'Non-Member' : `${attendee.userRole} Member`)
+                                      }
+                                    </span>
+                                    <span>
+                                      <span className="font-medium">Amount:</span> ${attendee.amountPaid}
+                                    </span>
+                                    <span>
+                                      <span className="font-medium">Registered:</span> {new Date(attendee.registeredAt).toLocaleDateString()}
+                                    </span>
+                                  </div>
                                 </div>
                                 
                                 {/* Download Receipt Button */}
-                                <div className="mt-2">
+                                <div className="pt-2 border-t border-gray-100">
                                   <a
                                     href={`/api/registrations/receipt/${attendee._id}`}
                                     download
-                                    className="inline-flex items-center text-xs bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700 transition-colors"
+                                    className="inline-flex items-center text-sm bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 transition-colors min-h-[36px]"
                                   >
-                                    <Receipt className="h-3 w-3 mr-1" />
-                                    Download Receipt
+                                    <Receipt className="h-4 w-4 mr-2 flex-shrink-0" />
+                                    <span>Download Receipt</span>
                                   </a>
                                 </div>
                               </div>
-                            </div>
+                            </motion.div>
                           ))}
                         </div>
-                      </div>
+                      </motion.div>
                     ) : (
-                      <p className="text-gray-500 text-center py-4">No attendees registered yet.</p>
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.3, delay: 0.2 }}
+                      >
+                        <p className="text-gray-500 text-center py-8 bg-gray-50 rounded-lg">
+                          No attendees registered yet.
+                        </p>
+                      </motion.div>
                     )}
-                  </div>
+                  </motion.div>
                 )}
               </div>
             </motion.div>

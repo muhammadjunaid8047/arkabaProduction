@@ -82,13 +82,26 @@ function Counter({ from, to, suffix = "", duration = 2, delay = 0 }) {
   );
 }
 
-// Utility function to limit text to specified words
+// Utility function to limit text to specified words and strip markdown formatting
 function truncateWords(text, limit) {
   if (!text) return "";
-  const words = text.split(" ");
+  
+  // Strip markdown formatting
+  let cleanText = text
+    // Remove bold formatting (**text**)
+    .replace(/\*\*(.*?)\*\*/g, '$1')
+    // Remove italic formatting (*text*)
+    .replace(/\*(.*?)\*/g, '$1')
+    // Remove headers (# ## ###)
+    .replace(/^#{1,6}\s+/gm, '')
+    // Remove other common markdown elements if needed
+    .replace(/`(.*?)`/g, '$1') // Remove code formatting
+    .trim();
+  
+  const words = cleanText.split(" ");
   return words.length > limit
     ? words.slice(0, limit).join(" ") + "..."
-    : text;
+    : cleanText;
 }
 
 export default function Home() {
@@ -901,9 +914,7 @@ export default function Home() {
                       e.target.src = "/images/event-2.jpg";
                     }}
                   />
-                    <div className="absolute top-4 right-4 bg-red-600 text-white px-3 py-1 rounded-full text-sm font-semibold">
-                      {event.ceus || "3"} CEUs
-                    </div>
+
                   </div>
                   <div className="p-6">
                     <h3 className="text-xl font-bold text-gray-800 mb-3 line-clamp-2">

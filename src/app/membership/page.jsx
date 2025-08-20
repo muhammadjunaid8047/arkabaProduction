@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
@@ -179,14 +179,46 @@ export default function MembershipPage() {
     role: "full",
     billingName: "",
     billingAddress: "",
+    shareInfoInternally: false,
+    memberType: "member",
+    businessName: "",
+    businessWebsite: "",
   });
   
+  // Function to validate form
+  const validateForm = useCallback(() => {
+    const errors = {};
+    
+    // Required fields validation
+    if (!form.fullName?.trim()) errors.fullName = "Full name is required";
+    if (!form.lastName?.trim()) errors.lastName = "Last name is required";
+    if (!form.email?.trim()) errors.email = "Email is required";
+    if (!form.password?.trim()) errors.password = "Password is required";
+    if (!form.billingName?.trim()) errors.billingName = "Billing name is required";
+    if (!form.billingAddress?.trim()) errors.billingAddress = "Billing address is required";
+    
+    // Business-specific validation
+    if (form.shareInfoInternally && form.memberType === "business" && !form.businessName?.trim()) {
+      errors.businessName = "Business name is required";
+    }
+    
+    setFormErrors(errors);
+    const isValid = Object.keys(errors).length === 0;
+    setIsFormValid(isValid);
+    return isValid;
+  }, [form]);
+
   // Redirect authenticated users to members portal
   useEffect(() => {
     if (status === "authenticated" && session) {
       router.push("/members-portal");
     }
   }, [session, status, router]);
+
+  // Check form validity whenever form changes
+  useEffect(() => {
+    validateForm();
+  }, [form, validateForm]);
 
   // Show loading while checking authentication
   if (status === "loading") {
@@ -243,6 +275,15 @@ export default function MembershipPage() {
       });
     }
 
+    // Business name validation
+    if (name === "businessName" && form.shareInfoInternally && form.memberType === "business") {
+      if (!value.trim()) {
+        setFormErrors(prev => ({ ...prev, businessName: "Business name is required" }));
+      } else {
+        setFormErrors(prev => ({ ...prev, businessName: "" }));
+      }
+    }
+
     // Clear error when user starts typing
     if (formErrors[name]) {
       setFormErrors(prev => ({ ...prev, [name]: "" }));
@@ -255,6 +296,12 @@ export default function MembershipPage() {
     // ✅ Validate required fields
     if (!form.fullName || !form.email || !form.password || !form.billingName || !form.billingAddress) {
       setMsg("Please fill in all required fields before proceeding.");
+      return;
+    }
+
+    // ✅ Validate business fields if member type is business
+    if (form.shareInfoInternally && form.memberType === "business" && !form.businessName) {
+      setMsg("Business name is required when selecting business as member type.");
       return;
     }
 
@@ -480,9 +527,9 @@ export default function MembershipPage() {
            </div>
 
            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-             <Input label="First Name" name="fullName" value={form.fullName} onChange={handleChange} required icon={<User className="h-4 w-4" />} />
-             <Input label="Last Name" name="lastName" value={form.lastName} onChange={handleChange} required icon={<User className="h-4 w-4" />} />
-             <Input label="Email" type="email" name="email" value={form.email} onChange={handleChange} required icon={<Mail className="h-4 w-4" />} />
+             <Input label="Full Name" name="fullName" value={form.fullName} onChange={handleChange} required icon={<User className="h-4 w-4" />} error={formErrors.fullName} />
+             <Input label="Last Name" name="lastName" value={form.lastName} onChange={handleChange} required icon={<User className="h-4 w-4" />} error={formErrors.lastName} />
+             <Input label="Email" type="email" name="email" value={form.email} onChange={handleChange} required icon={<Mail className="h-4 w-4" />} error={formErrors.email} />
              <Input label="Phone" name="phone" value={form.phone} onChange={handleChange} icon={<Phone className="h-4 w-4" />} />
              <Input label="BCBA/BCaBA #" name="bcba" value={form.bcba} onChange={handleChange} icon={<Award className="h-4 w-4" />} />
              <Input label="Affiliation" name="affiliation" value={form.affiliation} onChange={handleChange} icon={<Building className="h-4 w-4" />} />
@@ -496,18 +543,119 @@ export default function MembershipPage() {
                  showPassword={showPassword}
                  setShowPassword={setShowPassword}
                  strength={passwordStrength}
+                 error={formErrors.password}
                />
              </div>
-             <Input label="Billing Name" name="billingName" value={form.billingName} onChange={handleChange} required icon={<CreditCard className="h-4 w-4" />} />
-             <Input label="Billing Address" name="billingAddress" value={form.billingAddress} onChange={handleChange} required icon={<Globe className="h-4 w-4" />} />
+             <Input label="Billing Name" name="billingName" value={form.billingName} onChange={handleChange} required icon={<CreditCard className="h-4 w-4" />} error={formErrors.billingName} />
+             <Input label="Billing Address" name="billingAddress" value={form.billingAddress} onChange={handleChange} required icon={<Globe className="h-4 w-4" />} error={formErrors.billingAddress} />
            </div>
+
+           {/* Internal Sharing Preferences */}
+           <div className="mb-8">
+             <div className="flex items-center space-x-3 mb-4">
+               <input
+                 type="checkbox"
+                 id="shareInfoInternally"
+                 name="shareInfoInternally"
+                 checked={form.shareInfoInternally}
+                 onChange={(e) => setForm(prev => ({ ...prev, shareInfoInternally: e.target.checked }))}
+                 className="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500 focus:ring-2"
+               />
+               <label htmlFor="shareInfoInternally" className="text-sm font-semibold text-gray-700">
+                 Do you want to share your information internally with other members?
+               </label>
+             </div>
+
+             {/* Conditional Questions - Only show if shareInfoInternally is true */}
+             {form.shareInfoInternally && (
+               <motion.div
+                 initial={{ opacity: 0, height: 0 }}
+                 animate={{ opacity: 1, height: "auto" }}
+                 exit={{ opacity: 0, height: 0 }}
+                 transition={{ duration: 0.3 }}
+                 className="space-y-6 p-6 bg-gray-50 rounded-xl border border-gray-200"
+               >
+                 <h3 className="text-lg font-semibold text-gray-900 mb-4">Tell us about yourself</h3>
+                 
+                 {/* Member Type Selection */}
+                 <div>
+                   <label className="text-sm font-semibold text-gray-700 mb-3 block">Who are you? *</label>
+                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                     {[
+                       { value: "member", label: "Member", icon: <User className="h-4 w-4" /> },
+                       { value: "supervisor", label: "Supervisor", icon: <Award className="h-4 w-4" /> },
+                       { value: "business", label: "Business", icon: <Building className="h-4 w-4" /> }
+                     ].map((type) => (
+                       <button
+                         key={type.value}
+                         type="button"
+                         onClick={() => setForm(prev => ({ ...prev, memberType: type.value }))}
+                         className={`p-4 border-2 rounded-xl transition-all duration-300 flex flex-col items-center gap-2 ${
+                           form.memberType === type.value
+                             ? 'border-red-500 bg-red-50 text-red-700'
+                             : 'border-gray-200 hover:border-gray-300 text-gray-700'
+                         }`}
+                       >
+                         {type.icon}
+                         <span className="font-medium">{type.label}</span>
+                       </button>
+                     ))}
+                   </div>
+                 </div>
+
+                 {/* Business-specific questions */}
+                 {form.memberType === "business" && (
+                   <motion.div
+                     initial={{ opacity: 0, y: 10 }}
+                     animate={{ opacity: 1, y: 0 }}
+                     transition={{ delay: 0.2 }}
+                     className="space-y-4"
+                   >
+                     <Input 
+                       label="Business Name" 
+                       name="businessName" 
+                       value={form.businessName} 
+                       onChange={handleChange} 
+                       required 
+                       icon={<Building className="h-4 w-4" />} 
+                       error={formErrors.businessName}
+                     />
+                     <Input 
+                       label="Your Website Link (Optional)" 
+                       name="businessWebsite" 
+                       value={form.businessWebsite} 
+                       onChange={handleChange} 
+                       type="url"
+                       icon={<Globe className="h-4 w-4" />} 
+                     />
+                   </motion.div>
+                 )}
+               </motion.div>
+             )}
+           </div>
+
+          {!isFormValid && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-xl text-yellow-700 text-center"
+            >
+              <AlertCircle className="h-5 w-5 inline mr-2" />
+              Please fill in all required fields to proceed with payment
+            </motion.div>
+          )}
 
           {!clientSecret && (
             <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+              whileHover={isFormValid ? { scale: 1.02 } : {}}
+              whileTap={isFormValid ? { scale: 0.98 } : {}}
               onClick={handleSubmit}
-              className="w-full bg-gradient-to-r from-red-600 to-orange-600 text-white py-4 px-8 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-3"
+              disabled={!isFormValid}
+              className={`w-full py-4 px-8 rounded-xl font-semibold text-lg shadow-lg transition-all duration-300 flex items-center justify-center gap-3 ${
+                isFormValid 
+                  ? "bg-gradient-to-r from-red-600 to-orange-600 text-white hover:shadow-xl cursor-pointer"
+                  : "bg-gray-400 text-gray-200 cursor-not-allowed"
+              }`}
             >
               <Zap className="h-5 w-5" />
               Proceed to Payment
@@ -533,7 +681,12 @@ export default function MembershipPage() {
               className="mt-8"
             >
               <Elements options={{ clientSecret }} stripe={stripePromise}>
-                <CheckoutForm form={form} setMsg={setMsg} />
+                <CheckoutForm 
+                  form={form} 
+                  setMsg={setMsg} 
+                  isFormValid={isFormValid}
+                  validateForm={validateForm}
+                />
               </Elements>
             </motion.div>
           )}
