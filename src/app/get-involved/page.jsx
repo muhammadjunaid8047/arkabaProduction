@@ -1,9 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import SuccessModal from "@/components/SuccessModal";
 
 export default function GetInvolved() {
   const [loading, setLoading] = useState(false);
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -28,9 +31,16 @@ export default function GetInvolved() {
     });
 
     const result = await res.json();
-    alert(result.message);
+    
+    if (res.ok) {
+      setSuccessMessage(result.message);
+      setIsSuccessModalOpen(true);
+      form.reset();
+    } else {
+      alert(result.message || result.error); // Keep alert for errors
+    }
+    
     setLoading(false);
-    form.reset();
   };
 
   return (
@@ -152,6 +162,14 @@ export default function GetInvolved() {
           </div>
         </form>
       </div>
+      
+      {/* Success Modal */}
+      <SuccessModal
+        isOpen={isSuccessModalOpen}
+        onClose={() => setIsSuccessModalOpen(false)}
+        title="Thank You for Your Interest!"
+        message={successMessage || "We appreciate your willingness to get involved. We'll be in touch soon with opportunities that match your interests."}
+      />
     </div>
   );
 }

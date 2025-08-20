@@ -1,9 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import SuccessModal from "@/components/SuccessModal";
 
 export default function Contact() {
   const [loading, setLoading] = useState(false);
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -25,9 +28,16 @@ export default function Contact() {
     });
 
     const result = await res.json();
-    alert(result.message);
+    
+    if (res.ok) {
+      setSuccessMessage(result.message);
+      setIsSuccessModalOpen(true);
+      form.reset();
+    } else {
+      alert(result.message); // Keep alert for errors
+    }
+    
     setLoading(false);
-    form.reset();
   };
 
   return (
@@ -138,6 +148,14 @@ export default function Contact() {
           </div>
         </form>
       </div>
+      
+      {/* Success Modal */}
+      <SuccessModal
+        isOpen={isSuccessModalOpen}
+        onClose={() => setIsSuccessModalOpen(false)}
+        title="Message Sent Successfully!"
+        message={successMessage || "Thank you for contacting us. We'll get back to you as soon as possible."}
+      />
     </div>
   );
 }
