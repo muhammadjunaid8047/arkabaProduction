@@ -54,7 +54,15 @@ export async function GET(request, { params }) {
             z-index: 1000;
         }
         .download-btn:hover { background: #0056b3; }
-        .certificate-container { margin-top: 60px; }
+        .certificate-container { 
+            margin-top: 60px; 
+            page-break-inside: avoid;
+            break-inside: avoid;
+        }
+        .certificate {
+            page-break-inside: avoid;
+            break-inside: avoid;
+        }
     </style>
 </head>
 <body>
@@ -67,20 +75,29 @@ export async function GET(request, { params }) {
         function downloadPDF() {
             const element = document.querySelector('.certificate-container');
             const opt = {
-                margin: 0,
+                margin: [3, 3, 3, 3], // Very small margins for maximum content fit
                 filename: '${pdfFilename}',
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: { 
-                    scale: 2,
+                    scale: 1.0, // Use 1.0 scale for exact fit
                     useCORS: true,
-                    letterRendering: true
+                    letterRendering: true,
+                    width: 794, // A4 width in pixels (210mm * 3.78)
+                    height: 1123, // A4 height in pixels (297mm * 3.78)
+                    scrollX: 0,
+                    scrollY: 0
                 },
                 jsPDF: { 
                     unit: 'mm', 
                     format: 'a4', 
-                    orientation: 'landscape'
+                    orientation: 'portrait',
+                    compress: true
                 }
             };
+            
+            // Ensure the certificate fits on one page
+            element.style.pageBreakInside = 'avoid';
+            element.style.breakInside = 'avoid';
             
             html2pdf().set(opt).from(element).save();
         }

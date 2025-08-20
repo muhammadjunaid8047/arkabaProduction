@@ -147,22 +147,26 @@ export async function POST(req) {
         body {
             font-family: 'Georgia', serif;
             margin: 0;
-            padding: 20px;
+            padding: 10px;
             background: white;
             color: #333;
             min-height: 100vh;
+            page-break-inside: avoid;
+            break-inside: avoid;
         }
         .certificate {
-            width: 800px;
-            max-width: 800px;
+            width: 650px;
+            max-width: 650px;
             background: white;
-            border: 3px solid #1e40af;
-            border-radius: 15px;
-            padding: 40px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            border: 2px solid #1e40af;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
             position: relative;
             overflow: hidden;
             margin: 0 auto;
+            page-break-inside: avoid;
+            break-inside: avoid;
         }
         .certificate::before {
             content: '';
@@ -175,88 +179,97 @@ export async function POST(req) {
         }
         .header {
             text-align: center;
-            margin-bottom: 30px;
-            border-bottom: 3px solid #1e40af;
-            padding-bottom: 20px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #1e40af;
+            padding-bottom: 15px;
             position: relative;
         }
         .main-title {
-            font-size: 32px;
+            font-size: 24px;
             font-weight: bold;
-            margin-bottom: 10px;
+            margin-bottom: 6px;
             color: #1e40af;
             text-transform: uppercase;
-            letter-spacing: 2px;
+            letter-spacing: 1px;
         }
         .provider-info {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
-            font-size: 18px;
+            margin-bottom: 15px;
+            font-size: 16px;
             color: #374151;
         }
         .section {
-            margin-bottom: 25px;
+            margin-bottom: 15px;
             background: #f8fafc;
-            padding: 20px;
-            border-radius: 10px;
-            border-left: 4px solid #3b82f6;
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 3px solid #3b82f6;
             overflow: hidden;
         }
         .section-title {
-            font-size: 20px;
+            font-size: 16px;
             font-weight: bold;
-            margin-bottom: 15px;
+            margin-bottom: 8px;
             text-align: center;
             background: #1e40af;
             color: white;
-            padding: 12px;
-            border-radius: 8px;
+            padding: 8px;
+            border-radius: 6px;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
         }
         .field-row {
             display: flex;
-            gap: 20px;
-            margin-bottom: 15px;
+            gap: 12px;
+            margin-bottom: 8px;
         }
         .field {
             flex: 1;
             min-width: 0;
         }
+        .compact-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+        .compact-field {
+            min-width: 0;
+        }
         .field-label {
             font-weight: bold;
-            margin-bottom: 8px;
+            margin-bottom: 5px;
             display: block;
             color: #1e40af;
-            font-size: 14px;
+            font-size: 12px;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.3px;
         }
         .field-value {
-            border: 2px solid #e5e7eb;
-            padding: 12px;
+            border: 1px solid #e5e7eb;
+            padding: 8px;
             background: white;
-            min-height: 24px;
-            border-radius: 6px;
-            font-size: 16px;
+            min-height: 18px;
+            border-radius: 4px;
+            font-size: 13px;
             color: #374151;
             overflow-y: auto;
-            max-height: 100px;
+            max-height: 60px;
         }
         .single-field {
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
         .signature-section {
-            margin-top: 30px;
+            margin-top: 20px;
             border-top: 2px solid #d1d5db;
-            padding-top: 20px;
+            padding-top: 15px;
         }
         .signature-row {
             display: flex;
-            gap: 20px;
-            margin-bottom: 15px;
+            gap: 15px;
+            margin-bottom: 10px;
         }
         .signature-field {
             flex: 2;
@@ -267,28 +280,28 @@ export async function POST(req) {
             min-width: 0;
         }
         .score-section {
-            margin-top: 30px;
+            margin-top: 20px;
             text-align: center;
             background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-            padding: 25px;
-            border-radius: 12px;
+            padding: 18px;
+            border-radius: 10px;
             border: 2px solid #0ea5e9;
             overflow: hidden;
         }
         .score-text {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: bold;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             color: #0c4a6e;
         }
         .status-badge {
             display: inline-block;
-            padding: 8px 16px;
-            border-radius: 25px;
+            padding: 6px 12px;
+            border-radius: 20px;
             font-weight: bold;
-            font-size: 16px;
+            font-size: 14px;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
         }
         .status-passed {
             background: #dcfce7;
@@ -305,8 +318,8 @@ export async function POST(req) {
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%) rotate(-45deg);
-            font-size: 120px;
-            color: rgba(59, 130, 246, 0.1);
+            font-size: 80px;
+            color: rgba(59, 130, 246, 0.08);
             font-weight: bold;
             pointer-events: none;
             z-index: 1;
@@ -321,6 +334,21 @@ export async function POST(req) {
             right: 20px;
             font-size: 10px;
             color: #9ca3af;
+        }
+        
+        /* PDF-specific optimizations */
+        @media print {
+            .certificate {
+                width: 100% !important;
+                max-width: 100% !important;
+                padding: 20px !important;
+                margin: 0 !important;
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+            }
+            body {
+                padding: 10px !important;
+            }
         }
 
 
@@ -382,16 +410,16 @@ export async function POST(req) {
                         <div class="field-value">Self-paced</div>
                     </div>
                 </div>
-                <div class="field-row">
-                    <div class="field">
+                <div class="compact-row">
+                    <div class="compact-field">
                         <label class="field-label">Total CEUs</label>
                         <div class="field-value">${course.totalCEUs || '0'}</div>
                     </div>
-                    <div class="field">
+                    <div class="compact-field">
                         <label class="field-label">Ethics CEUs</label>
                         <div class="field-value">${course.ethicsCEUs || '0'}</div>
                     </div>
-                    <div class="field">
+                    <div class="compact-field">
                         <label class="field-label">Supervision CEUs</label>
                         <div class="field-value">${course.supervisionCEUs || '0'}</div>
                     </div>
@@ -450,7 +478,7 @@ export async function POST(req) {
                 <div class="status-badge status-passed">
                     ✅ PASSED
                 </div>
-                <p style="margin-top: 15px; font-size: 14px; color: #6b7280;">
+                <p style="margin-top: 10px; font-size: 12px; color: #6b7280;">
                     This certificate confirms successful completion of the course requirements.
                 </p>
             </div>
