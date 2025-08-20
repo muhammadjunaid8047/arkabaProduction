@@ -35,6 +35,9 @@ export default function MembersPage() {
   const [expiredTotalPages, setExpiredTotalPages] = useState(1);
   const [activeTotalCount, setActiveTotalCount] = useState(0);
   const [expiredTotalCount, setExpiredTotalCount] = useState(0);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+  const [isCreating, setIsCreating] = useState(false);
 
   const fetchActiveMembers = async (pageNumber = 1) => {
     try {
@@ -167,6 +170,11 @@ export default function MembersPage() {
 
   const handleCreate = async () => {
     try {
+      // Clear previous messages
+      setError('');
+      setSuccess('');
+      setIsCreating(true);
+      
       console.log('Creating member with data:', newMember);
       
       const res = await fetch('/api/member', {
@@ -180,12 +188,38 @@ export default function MembersPage() {
       
       if (!res.ok) {
         console.error('Failed to create member:', created);
-        alert('Failed to create member: ' + (created.error || 'Unknown error'));
+        
+        // Handle specific error types
+        if (created.error === 'Email already exists') {
+          setError('❌ Email already exists: A member with this email address already exists. Please use a different email or check if the member is already in the system.');
+        } else if (created.error === 'Missing required fields') {
+          setError(`❌ Missing required fields: ${created.message}`);
+        } else if (created.error === 'Invalid email format') {
+          setError('❌ Invalid email format: Please enter a valid email address');
+        } else if (created.error === 'Password too short') {
+          setError('❌ Password too short: Password must be at least 6 characters long');
+        } else if (created.error === 'Invalid role') {
+          setError('❌ Invalid role: Please select a valid role from the dropdown');
+        } else if (created.error === 'Invalid member type') {
+          setError('❌ Invalid member type: Please select a valid member type');
+        } else if (created.error === 'Business name required') {
+          setError('❌ Business name required: Business name is required when member type is set to Business');
+        } else if (created.error === 'Validation error') {
+          setError(`❌ Validation error: ${created.message}`);
+        } else if (created.error === 'Duplicate field') {
+          setError(`❌ Duplicate field: ${created.message}`);
+        } else {
+          setError(`❌ Failed to create member: ${created.message || created.error || 'Unknown error'}`);
+        }
         return;
       }
       
       console.log('Member created successfully, refreshing lists...');
       
+      // Show success message
+      setSuccess('✅ Member created successfully!');
+      
+      // Reset form
       setNewMember({
         fullName: '',
         lastName: '',
@@ -203,6 +237,10 @@ export default function MembersPage() {
         businessWebsite: '',
         isAdmin: false,
       });
+      
+      // Clear any error messages
+      setError('');
+      
       setActivePage(1);
       await fetchActiveMembers(1);
       
@@ -220,9 +258,15 @@ export default function MembersPage() {
       }
       
       console.log('Lists refreshed');
+      
+      // Clear success message after 5 seconds
+      setTimeout(() => setSuccess(''), 5000);
+      
     } catch (error) {
       console.error('Error creating member:', error);
-      alert('Error creating member: ' + error.message);
+      setError(`❌ Network error: ${error.message}. Please check your connection and try again.`);
+    } finally {
+      setIsCreating(false);
     }
   };
 
@@ -484,43 +528,90 @@ export default function MembersPage() {
           <CardTitle>Create New Member</CardTitle>
         </CardHeader>
         <CardContent>
+          {/* Error and Success Messages */}
+          {error && (
+            <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-md">
+              <p className="text-red-800 text-sm">{error}</p>
+            </div>
+          )}
+          {success && (
+            <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-md">
+              <p className="text-green-800 text-sm">{success}</p>
+            </div>
+          )}
           <div className="space-y-6">
             {/* Basic Information */}
             <div>
               <h4 className="text-md font-semibold mb-3">Basic Information</h4>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <Input
-                  placeholder="Full Name"
-                  value={newMember.fullName}
-                  onChange={(e) => setNewMember({ ...newMember, fullName: e.target.value })}
-                />
-                <Input
-                  placeholder="Last Name"
-                  value={newMember.lastName}
-                  onChange={(e) => setNewMember({ ...newMember, lastName: e.target.value })}
-                />
-                <Input
-                  placeholder="Email"
-                  type="email"
-                  value={newMember.email}
-                  onChange={(e) => setNewMember({ ...newMember, email: e.target.value })}
-                />
-                <Input
-                  placeholder="Phone"
-                  value={newMember.phone}
-                  onChange={(e) => setNewMember({ ...newMember, phone: e.target.value })}
-                />
-                <Input
-                  placeholder="Affiliation"
-                  value={newMember.affiliation}
-                  onChange={(e) => setNewMember({ ...newMember, affiliation: e.target.value })}
-                />
-                <Input
-                  placeholder="Password"
-                  type="password"
-                  value={newMember.password}
-                  onChange={(e) => setNewMember({ ...newMember, password: e.target.value })}
-                />
+                <div>
+                  <Input
+                    placeholder="Full Name *"
+                    value={newMember.fullName}
+                    onChange={(e) => {
+                      setNewMember({ ...newMember, fullName: e.target.value });
+                      if (error) setError('');
+                    }}
+                    className={!newMember.fullName.trim() ? 'border-red-300 focus:border-red-500' : ''}
+                  />
+                  {!newMember.fullName.trim() && (
+                    <p className="text-xs text-red-600 mt-1">Full Name is required</p>
+                  )}
+                </div>
+                <div>
+                  <Input
+                    placeholder="Last Name"
+                    value={newMember.lastName}
+                    onChange={(e) => setNewMember({ ...newMember, lastName: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <Input
+                    placeholder="Email *"
+                    type="email"
+                    value={newMember.email}
+                    onChange={(e) => {
+                      setNewMember({ ...newMember, email: e.target.value });
+                      if (error) setError('');
+                    }}
+                    className={!newMember.email.trim() ? 'border-red-300 focus:border-red-500' : ''}
+                  />
+                  {!newMember.email.trim() && (
+                    <p className="text-xs text-red-600 mt-1">Email is required</p>
+                  )}
+                </div>
+                <div>
+                  <Input
+                    placeholder="Phone"
+                    value={newMember.phone}
+                    onChange={(e) => setNewMember({ ...newMember, phone: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <Input
+                    placeholder="Affiliation"
+                    value={newMember.affiliation}
+                    onChange={(e) => setNewMember({ ...newMember, affiliation: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <Input
+                    placeholder="Password *"
+                    type="password"
+                    value={newMember.password}
+                    onChange={(e) => {
+                      setNewMember({ ...newMember, password: e.target.value });
+                      if (error) setError('');
+                    }}
+                    className={!newMember.password.trim() ? 'border-red-300 focus:border-red-500' : ''}
+                  />
+                  {!newMember.password.trim() && (
+                    <p className="text-xs text-red-600 mt-1">Password is required</p>
+                  )}
+                  {newMember.password && newMember.password.length < 6 && (
+                    <p className="text-xs text-red-600 mt-1">Password must be at least 6 characters</p>
+                  )}
+                </div>
                 <select
                   className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background"
                   value={newMember.role}
@@ -636,7 +727,23 @@ export default function MembersPage() {
             </div>
           </div>
           
-          <Button onClick={handleCreate} className="mt-6">Add Member</Button>
+          <Button 
+            onClick={handleCreate} 
+            className="mt-6" 
+            disabled={isCreating}
+          >
+            {isCreating ? (
+              <>
+                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Creating...
+              </>
+            ) : (
+              'Add Member'
+            )}
+          </Button>
         </CardContent>
       </Card>
 
