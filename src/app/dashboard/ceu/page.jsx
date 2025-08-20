@@ -1593,7 +1593,7 @@ export default function CourseAdminDashboard() {
 
                                 <a
 
-                                  href={res.certificateUrl}
+                                  href={res.certificateUrl.replace('/api/certificates/', '/api/certificates/pdf/')}
 
                                   target="_blank"
 
@@ -1603,7 +1603,7 @@ export default function CourseAdminDashboard() {
 
                                 >
 
-                                  Download
+                                  Download PDF
 
                                 </a>
 

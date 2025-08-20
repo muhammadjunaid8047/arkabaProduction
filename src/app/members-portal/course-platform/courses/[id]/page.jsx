@@ -354,12 +354,12 @@ export default function CoursePage() {
         {passed && certificateUrl && (
           <div className="mt-4">
             <a
-              href={certificateUrl}
+              href={certificateUrl.replace('/api/certificates/', '/api/certificates/pdf/')}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
             >
-              Download Certificate
+              Download Certificate as PDF
             </a>
           </div>
         )}

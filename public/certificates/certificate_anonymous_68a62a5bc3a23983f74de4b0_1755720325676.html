@@ -1,148 +1,10 @@
-import { NextResponse } from "next/server";
 
-import { auth } from "@/app/api/auth/[...nextauth]/route";
-
-import { connect } from "@/lib/mongodb/mongoose";
-
-import Course from "@/lib/models/course";
-
-import QuizResponse from "@/lib/models/quizResponse";
-
-import { promises as fs } from "fs";
-
-import path from "path";
-
-
-
-export async function POST(req) {
-
-  try {
-
-    // Get user session to identify the user
-
-    const session = await auth();
-
-    
-
-    const {
-
-      courseId,
-
-      answers,
-
-      userId,
-
-      studentName = "Anonymous User",
-
-    } = await req.json();
-
-
-
-    console.log("Quiz submission data:", {
-
-      courseId,
-
-      userId,
-
-      studentName,
-
-      userEmail: session?.user?.email,
-
-    });
-
-
-
-    if (!userId || !courseId || !answers) {
-
-      return NextResponse.json(
-
-        { error: "Missing required fields" },
-
-        { status: 400 }
-
-      );
-
-    }
-
-
-
-    await connect();
-
-    const course = await Course.findById(courseId);
-
-    if (!course) {
-
-      return NextResponse.json({ error: "Course not found" }, { status: 404 });
-
-    }
-
-
-
-    const currentDate = new Date();
-
-    if (course.expirationDate && course.expirationDate < currentDate) {
-
-      return NextResponse.json(
-
-        { error: "Course has expired" },
-
-        { status: 410 }
-
-      );
-
-    }
-
-
-
-    let score = 0;
-
-    course.quiz.forEach((question, index) => {
-
-      if (
-
-        question.correctAnswer.trim().toLowerCase() ===
-
-        answers[index]?.trim().toLowerCase()
-
-      ) {
-
-        score++;
-
-      }
-
-    });
-
-
-
-    const passThreshold = 0.7;
-
-    const passed = score / course.quiz.length >= passThreshold;
-
-
-
-    let certificateUrl = null;
-    if (passed) {
-      try {
-        // Always generate a new certificate with current information
-        const timestamp = Date.now();
-        const fileName = `certificate_${userId}_${courseId}_${timestamp}.html`;
-        const filePath = path.join(
-          process.cwd(),
-          "public",
-          "certificates",
-          fileName
-        );
-
-        await fs.mkdir(path.dirname(filePath), { recursive: true });
-
-        // Create HTML certificate with current information
-        const htmlContent = `
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=800, initial-scale=1.0">
-    <title>Continuing Education Certificate - ${course.title}</title>
+    <title>Continuing Education Certificate - abc</title>
     <style>
         body {
             font-family: 'Georgia', serif;
@@ -343,25 +205,21 @@ export async function POST(req) {
                 <div class="field-row">
                     <div class="field">
                         <label class="field-label">Participant Name</label>
-                        <div class="field-value">${studentName}</div>
+                        <div class="field-value">Faraz Alam</div>
                     </div>
                     <div class="field">
                         <label class="field-label">User Email</label>
-                        <div class="field-value">${session?.user?.email || 'N/A'}</div>
+                        <div class="field-value">board@arkaba.org</div>
                     </div>
                 </div>
                 <div class="field-row">
                     <div class="field">
                         <label class="field-label">BACB Certification Number</label>
-                        <div class="field-value">${course.bacbNumber || 'N/A'}</div>
+                        <div class="field-value">AB1000001</div>
                     </div>
                     <div class="field">
                         <label class="field-label">Completion Date</label>
-                        <div class="field-value">${new Date().toLocaleDateString('en-US', { 
-                            year: 'numeric', 
-                            month: 'long', 
-                            day: 'numeric' 
-                        })}</div>
+                        <div class="field-value">August 21, 2025</div>
                     </div>
                 </div>
             </div>
@@ -370,12 +228,12 @@ export async function POST(req) {
                 <div class="section-title">Course Information</div>
                 <div class="single-field">
                     <label class="field-label">Course Title</label>
-                    <div class="field-value">${course.title}</div>
+                    <div class="field-value">abc</div>
                 </div>
                 <div class="field-row">
                     <div class="field">
                         <label class="field-label">Content Type</label>
-                        <div class="field-value">${course.contentType || 'Online Course'}</div>
+                        <div class="field-value">video</div>
                     </div>
                     <div class="field">
                         <label class="field-label">Duration</label>
@@ -385,15 +243,15 @@ export async function POST(req) {
                 <div class="field-row">
                     <div class="field">
                         <label class="field-label">Total CEUs</label>
-                        <div class="field-value">${course.totalCEUs || '0'}</div>
+                        <div class="field-value">0.6</div>
                     </div>
                     <div class="field">
                         <label class="field-label">Ethics CEUs</label>
-                        <div class="field-value">${course.ethicsCEUs || '0'}</div>
+                        <div class="field-value">0.0</div>
                     </div>
                     <div class="field">
                         <label class="field-label">Supervision CEUs</label>
-                        <div class="field-value">${course.supervisionCEUs || '0'}</div>
+                        <div class="field-value">0.0</div>
                     </div>
                 </div>
             </div>
@@ -403,11 +261,11 @@ export async function POST(req) {
                 <div class="field-row">
                     <div class="field">
                         <label class="field-label">Instructor Name</label>
-                        <div class="field-value">${course.instructorName || 'N/A'}</div>
+                        <div class="field-value">Course Instructor</div>
                     </div>
                     <div class="field">
                         <label class="field-label">ACE Coordinator</label>
-                        <div class="field-value">${course.coordinatorName || 'N/A'}</div>
+                        <div class="field-value">ArkABA Coordinator</div>
                     </div>
                 </div>
             </div>
@@ -421,7 +279,7 @@ export async function POST(req) {
                     </div>
                     <div class="field">
                         <label class="field-label">Provider Number</label>
-                        <div class="field-value">${course.providerNumber || 'N/A'}</div>
+                        <div class="field-value">TBD</div>
                     </div>
                 </div>
             </div>
@@ -434,18 +292,14 @@ export async function POST(req) {
                     </div>
                     <div class="date-field">
                         <label class="field-label">Date</label>
-                        <div class="field-value">${new Date().toLocaleDateString('en-US', { 
-                            year: 'numeric', 
-                            month: 'long', 
-                            day: 'numeric' 
-                        })}</div>
+                        <div class="field-value">August 21, 2025</div>
                     </div>
                 </div>
             </div>
 
             <div class="score-section">
                 <div class="score-text">
-                    <strong>Quiz Score: ${score}/${course.quiz.length} (${Math.round((score / course.quiz.length) * 100)}%)</strong>
+                    <strong>Quiz Score: 5/5 (100%)</strong>
                 </div>
                 <div class="status-badge status-passed">
                     ✅ PASSED
@@ -456,104 +310,9 @@ export async function POST(req) {
             </div>
             
             <div class="certificate-id">
-                Certificate ID: ${userId}_${courseId}_${timestamp}
+                Certificate ID: anonymous_68a62a5bc3a23983f74de4b0_1755720325676
             </div>
         </div>
     </div>
 </body>
-</html>`
-
-
-
-        await fs.writeFile(filePath, htmlContent, "utf8");
-
-        certificateUrl = `/api/certificates/${fileName}`;
-
-        // Clean up old certificates for this user and course (optional)
-        try {
-          const oldCertificates = await fs.readdir(path.join(process.cwd(), "public", "certificates"));
-          const oldCertPattern = new RegExp(`certificate_${userId}_${courseId}_\\d+\\.html`);
-          
-          for (const oldCert of oldCertificates) {
-            if (oldCertPattern.test(oldCert) && oldCert !== fileName) {
-              const oldCertPath = path.join(process.cwd(), "public", "certificates", oldCert);
-              await fs.unlink(oldCertPath);
-              console.log(`Cleaned up old certificate: ${oldCert}`);
-            }
-          }
-        } catch (cleanupError) {
-          console.log("Certificate cleanup failed (non-critical):", cleanupError);
-        }
-
-      } catch (certError) {
-
-        console.error("Error generating certificate:", certError);
-
-        // Continue without certificate if generation fails
-
-        certificateUrl = null;
-
-      }
-
-    }
-
-
-
-    // Check if there's an existing response for this user and course
-    let existingResponse = await QuizResponse.findOne({ 
-      userId, 
-      courseId,
-      studentEmail: session?.user?.email || null 
-    });
-
-    let response;
-    if (existingResponse) {
-      // Update existing response with new score and certificate
-      existingResponse.score = score;
-      existingResponse.total = course.quiz.length;
-      existingResponse.passed = passed;
-      existingResponse.certificateUrl = certificateUrl;
-      existingResponse.certificateUpdatedAt = new Date();
-      existingResponse.updatedAt = new Date();
-      response = await existingResponse.save();
-    } else {
-      // Create new response
-      response = await QuizResponse.create({
-        userId,
-        studentEmail: session?.user?.email || null, // Include user's email if logged in
-        studentName,
-        courseId,
-        courseTitle: course.title,
-        score,
-        total: course.quiz.length,
-        passed,
-        certificateUrl,
-        certificateUpdatedAt: new Date(),
-      });
-    }
-
-
-
-    return NextResponse.json({
-
-      message: "Quiz submitted",
-
-      score,
-
-      passed,
-
-      certificateUrl,
-
-    });
-
-  } catch (error) {
-
-    console.error(error);
-
-    return NextResponse.json({ error: error.message }, { status: 500 });
-
-  }
-
-}
-
-
+</html>
