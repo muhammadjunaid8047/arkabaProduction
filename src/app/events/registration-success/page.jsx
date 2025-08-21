@@ -18,6 +18,7 @@ function RegistrationSuccessContent() {
   const [registration, setRegistration] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [emailSent, setEmailSent] = useState(false);
 
   const registrationId = searchParams.get('id');
 
@@ -27,6 +28,27 @@ function RegistrationSuccessContent() {
     }
   }, [registrationId]);
 
+  const sendConfirmationEmail = async (registrationId) => {
+    try {
+      const emailResponse = await fetch('/api/registrations/send-confirmation', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ registrationId })
+      });
+      
+      const emailResult = await emailResponse.json();
+      
+      if (emailResponse.ok) {
+        setEmailSent(true);
+        console.log('Confirmation email sent successfully for registration:', registrationId);
+      } else {
+        console.error('Failed to send confirmation email:', emailResult.error);
+      }
+    } catch (error) {
+      console.error('Network error sending confirmation email:', error);
+    }
+  };
+
   const fetchRegistrationDetails = async () => {
     try {
       const response = await fetch(`/api/registrations/${registrationId}`);
@@ -34,6 +56,12 @@ function RegistrationSuccessContent() {
       
       if (result.success) {
         setRegistration(result.registration);
+        
+        // Send confirmation email when registration details are loaded
+        // and download receipt button will be available
+        if (result.registration && result.registration._id && !emailSent) {
+          sendConfirmationEmail(result.registration._id);
+        }
       } else {
         setError(result.error || "Failed to fetch registration details");
       }
@@ -244,27 +272,15 @@ function RegistrationSuccessContent() {
               </ul>
             </div>
             
-            {/* Email Confirmation Notice - Only show for free registrations */}
-            {registration.amountPaid === 0 && (
-              <div className="mt-6 p-6 bg-green-50 border border-green-200 rounded-lg">
-                <h4 className="font-semibold text-green-900 mb-3">Email Confirmation Sent</h4>
-                <p className="text-sm text-green-800">
-                  A detailed confirmation email has been sent to <strong>{registration.email}</strong> with all your registration details 
-                  and important event information.
-                </p>
-              </div>
-            )}
-            
-            {/* No Email Notice for Paid Registrations */}
-            {registration.amountPaid > 0 && (
-              <div className="mt-6 p-6 bg-yellow-50 border border-yellow-200 rounded-lg">
-                <h4 className="font-semibold text-yellow-900 mb-3">📄 Receipt Available</h4>
-                <p className="text-sm text-yellow-800">
-                  Your registration is confirmed! Download your receipt above for your records. 
-                  No email confirmation will be sent - your receipt serves as your confirmation.
-                </p>
-              </div>
-            )}
+            {/* Email Confirmation Notice - Show for all registrations */}
+            <div className="mt-6 p-6 bg-green-50 border border-green-200 rounded-lg">
+              <h4 className="font-semibold text-green-900 mb-3">📧 Email Confirmation Sent</h4>
+              <p className="text-sm text-green-800">
+                A detailed confirmation email has been sent to <strong>{registration.email}</strong> with all your registration details 
+                and important event information.
+                {registration.amountPaid > 0 && " Your receipt is also available for download above."}
+              </p>
+            </div>
 
             {/* Navigation */}
             <div className="mt-8 text-center">

@@ -107,13 +107,14 @@ export async function POST(request) {
             type: 'event_registration',
             eventId: eventRegistration.eventId._id.toString(),
             eventRegistrationId: eventRegistrationId,
+            registrationId: registration._id.toString(), // Add registration ID for easier lookup
             userRole: eventPricingRole, // Use the mapped role for consistency
             email
           }
         });
 
         registration.paymentIntentId = paymentIntent.id;
-        registration.paymentStatus = 'completed'; // Auto-complete since payment is successful
+        registration.paymentStatus = 'pending'; // Will be updated to 'completed' via webhook when payment succeeds
 
         await registration.save();
 

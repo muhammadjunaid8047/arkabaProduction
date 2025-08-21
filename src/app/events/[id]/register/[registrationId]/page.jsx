@@ -250,6 +250,27 @@ export default function EventRegistrationPage({ params }) {
         if (result.success) {
           setSuccess(true);
           setSuccessRegistration(result.registration);
+          
+          // Send confirmation email for free registrations
+          if (result.registration && result.registration._id) {
+            try {
+              const emailResponse = await fetch('/api/registrations/send-confirmation', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ registrationId: result.registration._id })
+              });
+              
+              const emailResult = await emailResponse.json();
+              
+              if (emailResponse.ok) {
+                console.log('Confirmation email sent successfully for free registration:', result.registration._id);
+              } else {
+                console.error('Failed to send confirmation email:', emailResult.error);
+              }
+            } catch (error) {
+              console.error('Network error sending confirmation email:', error);
+            }
+          }
         } else {
           setError(result.error || "Registration failed");
         }
@@ -261,10 +282,49 @@ export default function EventRegistrationPage({ params }) {
     }
   };
 
-  const onPaymentSuccess = (registration) => {
+  const onPaymentSuccess = async (registration) => {
     setSuccess(true);
     setSuccessRegistration(registration);
     setShowPayment(false);
+    
+    // Update payment status as backup to webhook (in case webhook is delayed/failed)
+    if (registration && registration._id && registration.paymentIntentId) {
+      try {
+        await fetch('/api/registrations/update-payment-status', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            registrationId: registration._id,
+            paymentIntentId: registration.paymentIntentId,
+            paymentStatus: 'completed' 
+          })
+        });
+        console.log('Payment status updated as backup to webhook');
+      } catch (error) {
+        console.error('Failed to update payment status:', error);
+      }
+    }
+
+    // Send confirmation email after successful payment
+    if (registration && registration._id) {
+      try {
+        const emailResponse = await fetch('/api/registrations/send-confirmation', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ registrationId: registration._id })
+        });
+        
+        const emailResult = await emailResponse.json();
+        
+        if (emailResponse.ok) {
+          console.log('Confirmation email sent successfully for registration:', registration._id);
+        } else {
+          console.error('Failed to send confirmation email:', emailResult.error);
+        }
+      } catch (error) {
+        console.error('Network error sending confirmation email:', error);
+      }
+    }
   };
 
   const onPaymentError = (errorMessage) => {

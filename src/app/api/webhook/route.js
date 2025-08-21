@@ -2,6 +2,7 @@ import Stripe from 'stripe';
 import { headers } from 'next/headers';
 import { connect } from "@/lib/mongodb/mongoose";
 import { Member } from "@/lib/models/member.model";
+import Registration from "@/lib/models/registration";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
@@ -154,16 +155,91 @@ async function handlePaymentIntentCreated(paymentIntent) {
 }
 
 async function handlePaymentIntentSucceeded(paymentIntent) {
-  console.log('Payment intent succeeded:', paymentIntent.id);
+  console.log('=== PAYMENT INTENT SUCCEEDED (alt webhook) ===');
+  console.log('Payment intent ID:', paymentIntent.id);
   console.log('Payment intent status:', paymentIntent.status);
   console.log('Payment intent amount:', paymentIntent.amount);
   console.log('Payment intent customer:', paymentIntent.customer);
+  console.log('Payment intent metadata:', JSON.stringify(paymentIntent.metadata, null, 2));
+  
+  // Check if this is an event registration payment
+  if (paymentIntent.metadata && paymentIntent.metadata.type === 'event_registration') {
+    console.log('=== HANDLING EVENT REGISTRATION PAYMENT (alt webhook) ===');
+    
+    try {
+      // Find the registration by payment intent ID
+      console.log('Searching for registration with paymentIntentId:', paymentIntent.id);
+      const registration = await Registration.findOne({ 
+        paymentIntentId: paymentIntent.id 
+      });
+      
+      if (registration) {
+        console.log('✅ Found registration:', {
+          id: registration._id,
+          email: registration.email,
+          currentPaymentStatus: registration.paymentStatus,
+          amountPaid: registration.amountPaid
+        });
+        
+        // Update payment status to completed
+        registration.paymentStatus = 'completed';
+        await registration.save();
+        
+        console.log('✅ Registration payment status updated to completed');
+        console.log('Email will be sent from frontend after download receipt button is generated');
+      } else {
+        console.error('❌ No registration found for payment intent:', paymentIntent.id);
+        // Let's also search by registrationId in metadata if available
+        if (paymentIntent.metadata.registrationId) {
+          console.log('Trying to find by registrationId from metadata:', paymentIntent.metadata.registrationId);
+          const regByMetadata = await Registration.findById(paymentIntent.metadata.registrationId);
+          if (regByMetadata) {
+            console.log('Found registration by metadata ID, updating paymentIntentId and status');
+            regByMetadata.paymentIntentId = paymentIntent.id;
+            regByMetadata.paymentStatus = 'completed';
+            await regByMetadata.save();
+            console.log('✅ Registration updated via metadata lookup');
+          }
+        }
+      }
+    } catch (error) {
+      console.error('❌ Error handling event registration payment success:', error);
+    }
+  } else {
+    console.log('Not an event registration payment - skipping');
+  }
 }
 
 async function handlePaymentIntentFailed(paymentIntent) {
   console.log('Payment intent failed:', paymentIntent.id);
   console.log('Payment intent status:', paymentIntent.status);
   console.log('Payment intent last_payment_error:', paymentIntent.last_payment_error);
+  
+  // Check if this is an event registration payment
+  if (paymentIntent.metadata && paymentIntent.metadata.type === 'event_registration') {
+    console.log('Handling event registration payment failure');
+    
+    try {
+      // Find the registration by payment intent ID
+      const registration = await Registration.findOne({ 
+        paymentIntentId: paymentIntent.id 
+      });
+      
+      if (registration) {
+        console.log('Found registration:', registration._id);
+        
+        // Update payment status to failed
+        registration.paymentStatus = 'failed';
+        await registration.save();
+        
+        console.log('Event registration payment status updated to failed');
+      } else {
+        console.error('No registration found for failed payment intent:', paymentIntent.id);
+      }
+    } catch (error) {
+      console.error('Error handling event registration payment failure:', error);
+    }
+  }
 }
 
 async function handlePaymentIntentCanceled(paymentIntent) {
