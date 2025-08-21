@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, useAnimation } from "framer-motion";
+import RichTextRenderer from "@/components/RichTextRenderer";
 import { 
   FaArrowLeft, 
   FaArrowRight, 
@@ -1163,9 +1164,9 @@ export default function Home() {
                       )}
                     </div>
                     
-                    <p className="text-gray-600 mb-4 line-clamp-3">
-                      {truncateWords(job.description, 20)}
-                    </p>
+                    <div className="text-gray-600 mb-4 line-clamp-3">
+                      <RichTextRenderer content={truncateWords(job.description, 20)} />
+                    </div>
                     <Link
                       href="/jobs"
                       className="inline-flex items-center text-red-600 font-semibold hover:text-red-700 transition-colors"

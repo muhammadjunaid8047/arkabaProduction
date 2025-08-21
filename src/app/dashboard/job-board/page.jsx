@@ -14,6 +14,7 @@ import {
   Clock,
   Mail,
 } from "lucide-react";
+import RichTextEditor from "@/components/RichTextEditor";
 
 export default function AdminDashboard() {
   const [tab, setTab] = useState("approval");
@@ -373,28 +374,15 @@ export default function AdminDashboard() {
 
                 {/* Description Field */}
                 <div className="space-y-1">
-                  <label
-                    htmlFor="description"
-                    className="block text-xs sm:text-sm font-medium text-gray-700"
-                  >
-                    Description *
-                  </label>
-                  <div className="relative rounded-md shadow-sm">
-                    <div className="absolute inset-y-0 left-0 pl-3 pt-2 sm:pt-3 flex items-start pointer-events-none">
-                      <FileText className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" />
-                    </div>
-                    <textarea
-                      id="description"
-                      rows={4}
-                      placeholder="Detailed job description, responsibilities, and requirements..."
-                      value={newJob.description}
-                      onChange={(e) =>
-                        setNewJob({ ...newJob, description: e.target.value })
-                      }
-                      className="block w-full pl-9 sm:pl-10 py-2 sm:py-3 border border-gray-300 rounded-md shadow-sm focus:ring-red-500 focus:border-red-500 text-xs sm:text-sm"
-                      required
-                    />
-                  </div>
+                  <RichTextEditor
+                    label="Description"
+                    value={newJob.description}
+                    onChange={(value) => setNewJob({ ...newJob, description: value })}
+                    placeholder="Detailed job description, responsibilities, and requirements..."
+                    required={true}
+                    rows={6}
+                    id="job-description-editor"
+                  />
                 </div>
 
                 {/* Company and Location Fields */}

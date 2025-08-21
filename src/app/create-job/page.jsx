@@ -19,6 +19,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
+import RichTextEditor from "@/components/RichTextEditor";
 
 export default function CreateJobPage() {
   const [form, setForm] = useState({
@@ -249,16 +250,14 @@ export default function CreateJobPage() {
 
                 {/* Job Description */}
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
-                    <FileText className="h-4 w-4" />
-                    Job Description *
-                  </label>
-                  <Textarea
-                    placeholder="Provide a detailed description of the position, responsibilities, requirements, and benefits..."
+                  <RichTextEditor
+                    label="Job Description"
                     value={form.description}
-                    onChange={(e) => setForm({ ...form, description: e.target.value })}
-                    className="min-h-[120px] resize-none"
-                    required
+                    onChange={(value) => setForm({ ...form, description: value })}
+                    placeholder="Provide a detailed description of the position, responsibilities, requirements, and benefits..."
+                    required={true}
+                    rows={8}
+                    id="job-description-public-editor"
                   />
                   <p className="text-xs text-gray-500">
                     Include key responsibilities, qualifications, and what makes this opportunity unique.

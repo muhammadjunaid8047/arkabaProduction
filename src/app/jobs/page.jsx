@@ -22,6 +22,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import RichTextRenderer from "@/components/RichTextRenderer";
 
 export default function JobsPage() {
   const [jobs, setJobs] = useState([]);
@@ -258,9 +259,9 @@ export default function JobsPage() {
 
                       {/* Description Preview */}
                       <div className="mb-1 sm:mb-2">
-                        <p className="text-xs sm:text-sm text-gray-600 line-clamp-2 leading-relaxed">
-                          {job.description}
-                        </p>
+                        <div className="text-xs sm:text-sm text-gray-600 line-clamp-2 leading-relaxed">
+                          <RichTextRenderer content={job.description} />
+                        </div>
                       </div>
 
                       {/* Action Row */}
@@ -331,9 +332,9 @@ export default function JobsPage() {
                               <h4 className="font-medium text-gray-900 text-xs sm:text-sm md:text-base mb-1 sm:mb-2">
                                 Full Description
                               </h4>
-                              <p className="text-xs sm:text-sm text-gray-600 leading-relaxed break-words max-h-96 overflow-y-auto">
-                                {job.description}
-                              </p>
+                              <div className="text-xs sm:text-sm text-gray-600 leading-relaxed break-words max-h-96 overflow-y-auto">
+                                <RichTextRenderer content={job.description} />
+                              </div>
                             </div>
 
                             {/* Additional Details */}
