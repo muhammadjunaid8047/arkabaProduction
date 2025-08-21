@@ -3,7 +3,9 @@ import Event from "@/lib/models/event.js";
 
 export async function GET(request, { params }) {
   try {
-    const { id } = params;
+    // Unwrap params for Next.js 15 compatibility
+    const unwrappedParams = await params;
+    const { id } = unwrappedParams;
     
     if (!id) {
       return new Response(

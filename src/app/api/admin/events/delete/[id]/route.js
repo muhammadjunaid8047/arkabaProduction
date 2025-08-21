@@ -5,7 +5,9 @@ import Event from "@/lib/models/event";
 export async function DELETE(request, { params }) {
   try {
     await connect();
-    const { id } = params;
+    // Unwrap params for Next.js 15 compatibility
+    const unwrappedParams = await params;
+    const { id } = unwrappedParams;
     
     const deletedEvent = await Event.findByIdAndDelete(id);
 

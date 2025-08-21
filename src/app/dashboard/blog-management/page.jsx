@@ -14,6 +14,11 @@ import {
   User,
   Tag,
   Image as ImageIcon,
+  Bold,
+  Italic,
+  List,
+  Link,
+  Type,
 } from "lucide-react";
 
 export default function BlogManagementPage() {
@@ -32,6 +37,7 @@ export default function BlogManagementPage() {
     published: false,
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [contentTextareaRef, setContentTextareaRef] = useState(null);
 
   const fetchBlogs = async () => {
     const res = await fetch("/api/admin/blog/blogs");
@@ -115,6 +121,72 @@ export default function BlogManagementPage() {
       ...blog,
       tags: blog.tags.join(", "),
     });
+  };
+
+  // Text formatting functions
+  const insertTextAtCursor = (textarea, textToInsert) => {
+    if (!textarea) return;
+    
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const currentContent = editingBlog ? editingBlog.content : newBlog.content;
+    
+    const newContent = 
+      currentContent.substring(0, start) + 
+      textToInsert + 
+      currentContent.substring(end);
+    
+    if (editingBlog) {
+      setEditingBlog({ ...editingBlog, content: newContent });
+    } else {
+      setNewBlog({ ...newBlog, content: newContent });
+    }
+    
+    // Set cursor position after inserted text
+    setTimeout(() => {
+      textarea.selectionStart = start + textToInsert.length;
+      textarea.selectionEnd = start + textToInsert.length;
+      textarea.focus();
+    }, 0);
+  };
+
+  const formatText = (type) => {
+    if (!contentTextareaRef) return;
+    
+    const textarea = contentTextareaRef;
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selectedText = textarea.value.substring(start, end);
+    
+    let formattedText = '';
+    
+    switch (type) {
+      case 'h1':
+        formattedText = selectedText ? `# ${selectedText}` : '# Heading 1';
+        break;
+      case 'h2':
+        formattedText = selectedText ? `## ${selectedText}` : '## Heading 2';
+        break;
+      case 'h3':
+        formattedText = selectedText ? `### ${selectedText}` : '### Heading 3';
+        break;
+      case 'bold':
+        formattedText = selectedText ? `**${selectedText}**` : '**Bold Text**';
+        break;
+      case 'italic':
+        formattedText = selectedText ? `*${selectedText}*` : '*Italic Text*';
+        break;
+      case 'list':
+        formattedText = selectedText ? `- ${selectedText}` : '- List item';
+        break;
+      case 'link':
+        formattedText = selectedText ? `[${selectedText}](URL)` : '[Link Text](URL)';
+        break;
+      default:
+        return;
+    }
+    
+    insertTextAtCursor(textarea, formattedText);
   };
 
   useEffect(() => {
@@ -547,7 +619,7 @@ export default function BlogManagementPage() {
                   </div>
                 </div>
 
-                {/* Content Field */}
+                {/* Content Field with Formatting Toolbar */}
                 <div className="space-y-1">
                   <label
                     htmlFor="content"
@@ -555,14 +627,96 @@ export default function BlogManagementPage() {
                   >
                     Content *
                   </label>
-                  <div className="relative rounded-md shadow-sm">
+                  
+                  {/* Formatting Toolbar */}
+                  <div className="border border-gray-300 rounded-t-md bg-gray-50 px-3 py-2">
+                    <div className="flex flex-wrap gap-1 sm:gap-2">
+                      {/* Headings */}
+                      <div className="flex border-r border-gray-300 pr-2 mr-2">
+                        <button
+                          type="button"
+                          onClick={() => formatText('h1')}
+                          className="inline-flex items-center px-2 py-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-l hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-red-500"
+                          title="Heading 1"
+                        >
+                          <Type className="h-3 w-3 mr-1" />
+                          H1
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => formatText('h2')}
+                          className="inline-flex items-center px-2 py-1 text-xs font-medium text-gray-700 bg-white border-t border-b border-gray-300 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-red-500"
+                          title="Heading 2"
+                        >
+                          H2
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => formatText('h3')}
+                          className="inline-flex items-center px-2 py-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-r hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-red-500"
+                          title="Heading 3"
+                        >
+                          H3
+                        </button>
+                      </div>
+                      
+                      {/* Text Formatting */}
+                      <div className="flex border-r border-gray-300 pr-2 mr-2">
+                        <button
+                          type="button"
+                          onClick={() => formatText('bold')}
+                          className="inline-flex items-center px-2 py-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-l hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-red-500"
+                          title="Bold"
+                        >
+                          <Bold className="h-3 w-3" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => formatText('italic')}
+                          className="inline-flex items-center px-2 py-1 text-xs font-medium text-gray-700 bg-white border-t border-b border-r border-gray-300 rounded-r hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-red-500"
+                          title="Italic"
+                        >
+                          <Italic className="h-3 w-3" />
+                        </button>
+                      </div>
+                      
+                      {/* Lists and Links */}
+                      <div className="flex">
+                        <button
+                          type="button"
+                          onClick={() => formatText('list')}
+                          className="inline-flex items-center px-2 py-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-l hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-red-500"
+                          title="Bullet List"
+                        >
+                          <List className="h-3 w-3" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => formatText('link')}
+                          className="inline-flex items-center px-2 py-1 text-xs font-medium text-gray-700 bg-white border-t border-b border-r border-gray-300 rounded-r hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-red-500"
+                          title="Link"
+                        >
+                          <Link className="h-3 w-3" />
+                        </button>
+                      </div>
+                    </div>
+                    
+                    {/* Formatting Help Text */}
+                    <div className="mt-2 text-xs text-gray-500">
+                      <strong>Tip:</strong> Select text and click buttons to format, or click buttons to insert templates. Supports Markdown syntax.
+                    </div>
+                  </div>
+                  
+                  {/* Content Textarea */}
+                  <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 pt-2 sm:pt-3 flex items-start pointer-events-none">
                       <FileText className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" />
                     </div>
                     <textarea
                       id="content"
-                      rows={8}
-                      placeholder="Write your blog post content here..."
+                      ref={setContentTextareaRef}
+                      rows={12}
+                      placeholder="Write your blog post content here... Use the toolbar above for formatting or type Markdown directly."
                       value={
                         editingBlog ? editingBlog.content : newBlog.content
                       }
@@ -574,9 +728,15 @@ export default function BlogManagementPage() {
                             })
                           : setNewBlog({ ...newBlog, content: e.target.value })
                       }
-                      className="block w-full pl-9 sm:pl-10 py-2 sm:py-3 border border-gray-300 rounded-md shadow-sm focus:ring-red-500 focus:border-red-500 text-xs sm:text-sm"
+                      className="block w-full pl-9 sm:pl-10 py-2 sm:py-3 border-l border-r border-b border-gray-300 rounded-b-md shadow-sm focus:ring-red-500 focus:border-red-500 text-xs sm:text-sm font-mono"
+                      style={{ borderTop: 'none' }}
                       required
                     />
+                  </div>
+                  
+                  {/* Markdown Preview Hint */}
+                  <div className="text-xs text-gray-500 mt-1">
+                    <strong>Markdown supported:</strong> # H1, ## H2, ### H3, **bold**, *italic*, - lists, [links](url)
                   </div>
                 </div>
 

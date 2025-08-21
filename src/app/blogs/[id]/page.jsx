@@ -3,6 +3,7 @@ import { Calendar, User, Tag, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import BlogImage from "@/components/BlogImage";
+import { marked } from "marked";
 
 async function getBlog(id) {
   try {
@@ -154,9 +155,14 @@ export default async function BlogPostPage({ params }) {
             {/* Content */}
             <div className="prose prose-lg max-w-none">
               <div 
-                className="text-gray-700 leading-relaxed"
+                className="text-gray-700 leading-relaxed blog-content"
                 dangerouslySetInnerHTML={{ 
-                  __html: blog.content.replace(/\n/g, '<br />') 
+                  __html: marked(blog.content, {
+                    breaks: true,
+                    gfm: true,
+                    headerIds: false,
+                    sanitize: false
+                  })
                 }}
               />
             </div>

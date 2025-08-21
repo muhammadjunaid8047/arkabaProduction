@@ -5,7 +5,9 @@ import Event from "@/lib/models/event";
 export async function PUT(request, { params }) {
   try {
     await connect();
-    const { id } = params;
+    // Unwrap params for Next.js 15 compatibility
+    const unwrappedParams = await params;
+    const { id } = unwrappedParams;
     const body = await request.json();
     
     const { 

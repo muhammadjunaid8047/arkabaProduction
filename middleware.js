@@ -16,6 +16,24 @@ export default withAuth(
       return NextResponse.redirect(new URL("/members-login", req.url));
     }
 
+    // Check for expired membership - redirect to payment history for any protected route
+    if (token && token.isMembershipActive === false) {
+      // Allow access to payment history and logout pages
+      if (pathname === "/members-portal/payment-history" || 
+          pathname === "/api/auth/signout" ||
+          pathname.startsWith("/api/auth/")) {
+        return NextResponse.next();
+      }
+      
+      // Redirect expired users to payment history
+      if (pathname.startsWith("/members-portal") || 
+          pathname.startsWith("/dashboard") ||
+          pathname.startsWith("/events/") ||
+          pathname.includes("members-only")) {
+        return NextResponse.redirect(new URL("/members-portal/payment-history?expired=true", req.url));
+      }
+    }
+
     return NextResponse.next();
   },
   {
@@ -32,6 +50,8 @@ export const config = {
   matcher: [
     "/members-login",
     "/membership", 
-    "/members-portal/:path*"
+    "/members-portal/:path*",
+    "/dashboard/:path*",
+    "/events/:path*/register/:path*"
   ],
 }; 

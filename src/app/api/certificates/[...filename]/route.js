@@ -4,7 +4,9 @@ import fs from 'fs';
 
 export async function GET(request, { params }) {
   try {
-    const { filename } = params;
+    // Unwrap params for Next.js 15 compatibility
+    const unwrappedParams = await params;
+    const { filename } = unwrappedParams;
     
     // Handle catch-all route - filename is an array, join it
     const filenameString = Array.isArray(filename) ? filename.join('/') : filename;

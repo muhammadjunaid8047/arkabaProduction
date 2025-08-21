@@ -9,6 +9,16 @@ export async function GET(request, { params }) {
     // Unwrap params for Next.js 15 compatibility
     const unwrappedParams = await params;
     
+    console.log('Fetching event registration with ID:', unwrappedParams.id);
+    
+    // Validate ObjectId format
+    if (!unwrappedParams.id || !unwrappedParams.id.match(/^[0-9a-fA-F]{24}$/)) {
+      return NextResponse.json(
+        { error: "Invalid event registration ID format" },
+        { status: 400 }
+      );
+    }
+    
     const eventRegistration = await EventRegistration.findById(unwrappedParams.id)
       .populate('eventId', 'title date location description backgroundImage');
     
@@ -44,8 +54,13 @@ export async function GET(request, { params }) {
     
   } catch (error) {
     console.error("Error fetching event registration:", error);
+    console.error("Error details:", {
+      name: error.name,
+      message: error.message,
+      stack: error.stack
+    });
     return NextResponse.json(
-      { error: "Failed to fetch event registration" },
+      { error: "Failed to fetch event registration", details: error.message },
       { status: 500 }
     );
   }

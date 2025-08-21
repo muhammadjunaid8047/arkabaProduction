@@ -4,7 +4,9 @@ import fs from 'fs';
 
 export async function GET(request, { params }) {
   try {
-    const { filename } = params;
+    // Unwrap params for Next.js 15 compatibility
+    const unwrappedParams = await params;
+    const { filename } = unwrappedParams;
     
     // Remove .html extension if present and add .pdf
     const baseFilename = filename.replace('.html', '');

@@ -117,13 +117,8 @@ export async function POST(request) {
 
         await registration.save();
 
-        // Send confirmation email
-        try {
-          await sendEventRegistrationConfirmation(registration);
-        } catch (emailError) {
-          console.error("Failed to send confirmation email:", emailError);
-          // Don't fail the registration if email fails
-        }
+        // Don't send email for paid registrations - user will get download receipt button instead
+        console.log("Registration created successfully - payment completed, no email sent");
 
         return NextResponse.json({
           success: true,
@@ -153,12 +148,16 @@ export async function POST(request) {
         });
       }
 
-      // Send confirmation email
-      try {
-        await sendEventRegistrationConfirmation(registration);
-      } catch (emailError) {
-        console.error("Failed to send confirmation email:", emailError);
-        // Don't fail the registration if email fails
+      // Send confirmation email for free registrations only
+      if (amountPaid === 0) {
+        try {
+          await sendEventRegistrationConfirmation(registration);
+        } catch (emailError) {
+          console.error("Failed to send confirmation email:", emailError);
+          // Don't fail the registration if email fails
+        }
+      } else {
+        console.log("Paid registration - no email sent, user will get receipt download");
       }
 
       return NextResponse.json({

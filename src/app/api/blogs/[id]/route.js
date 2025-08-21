@@ -5,7 +5,9 @@ import Blog from "@/lib/models/blog";
 export async function GET(req, { params }) {
   try {
     await connect();
-    const { id } = params;
+    // Unwrap params for Next.js 15 compatibility
+    const unwrappedParams = await params;
+    const { id } = unwrappedParams;
     
     const blog = await Blog.findOne({ _id: id, published: true });
     

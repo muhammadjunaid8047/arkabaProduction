@@ -238,20 +238,33 @@ function RegistrationSuccessContent() {
               <h4 className="font-semibold text-blue-900 mb-3">Important Information</h4>
               <ul className="text-sm text-blue-800 space-y-2">
                 <li>• Please save this confirmation for your records</li>
-                <li>• You will receive an email confirmation shortly</li>
+                {registration.amountPaid === 0 && <li>• You will receive an email confirmation shortly</li>}
                 <li>• Bring this receipt or confirmation to the event</li>
                 <li>• For questions, contact us at support@arkaba.org</li>
               </ul>
             </div>
             
-            {/* Email Confirmation Notice */}
-            <div className="mt-6 p-6 bg-green-50 border border-green-200 rounded-lg">
-              <h4 className="font-semibold text-green-900 mb-3">Email Confirmation Sent</h4>
-              <p className="text-sm text-green-800">
-                A detailed confirmation email has been sent to <strong>{registration.email}</strong> with all your registration details, 
-                including a downloadable receipt and important event information.
-              </p>
-            </div>
+            {/* Email Confirmation Notice - Only show for free registrations */}
+            {registration.amountPaid === 0 && (
+              <div className="mt-6 p-6 bg-green-50 border border-green-200 rounded-lg">
+                <h4 className="font-semibold text-green-900 mb-3">Email Confirmation Sent</h4>
+                <p className="text-sm text-green-800">
+                  A detailed confirmation email has been sent to <strong>{registration.email}</strong> with all your registration details 
+                  and important event information.
+                </p>
+              </div>
+            )}
+            
+            {/* No Email Notice for Paid Registrations */}
+            {registration.amountPaid > 0 && (
+              <div className="mt-6 p-6 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <h4 className="font-semibold text-yellow-900 mb-3">📄 Receipt Available</h4>
+                <p className="text-sm text-yellow-800">
+                  Your registration is confirmed! Download your receipt above for your records. 
+                  No email confirmation will be sent - your receipt serves as your confirmation.
+                </p>
+              </div>
+            )}
 
             {/* Navigation */}
             <div className="mt-8 text-center">

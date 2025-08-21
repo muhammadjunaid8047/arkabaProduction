@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
+import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { 
   CreditCard, 
@@ -18,6 +19,8 @@ import PaymentDetailsModal from "@/components/PaymentDetailsModal";
 
 export default function PaymentHistoryPage() {
   const { data: session, status } = useSession();
+  const searchParams = useSearchParams();
+  const isExpiredRedirect = searchParams.get('expired') === 'true';
   const [paymentHistory, setPaymentHistory] = useState([]);
   const [memberInfo, setMemberInfo] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -199,6 +202,45 @@ export default function PaymentHistoryPage() {
             </button> */}
           </div>
         </motion.div>
+
+        {/* Expired Membership Redirect Alert */}
+        {isExpiredRedirect && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.05 }}
+            className="mb-8 p-6 bg-red-50 border-2 border-red-200 rounded-lg"
+          >
+            <div className="flex items-start">
+              <div className="flex-shrink-0">
+                <XCircle className="h-6 w-6 text-red-600" />
+              </div>
+              <div className="ml-3">
+                <h3 className="text-lg font-semibold text-red-800 mb-2">
+                  🚫 Access Restricted - Membership Expired
+                </h3>
+                <p className="text-red-700 mb-4">
+                  Your ArkABA membership has expired and you've been redirected here from a members-only area. 
+                  To continue accessing member benefits, features, and resources, please renew your membership below.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <a
+                    href="/membership-renewal"
+                    className="inline-flex items-center justify-center px-6 py-3 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition-colors"
+                  >
+                    🔄 Renew Membership Now
+                  </a>
+                  <a
+                    href="/members-portal"
+                    className="inline-flex items-center justify-center px-6 py-3 bg-white text-red-600 border border-red-600 font-semibold rounded-lg hover:bg-red-50 transition-colors"
+                  >
+                    ← Back to Member Portal
+                  </a>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
 
         {/* Membership Information */}
         {memberInfo && (

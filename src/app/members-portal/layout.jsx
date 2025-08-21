@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSession, signIn, signOut } from "next-auth/react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   User,
@@ -33,8 +33,24 @@ import { Loader2 } from "lucide-react";
 export default function MembersPage({ children }) {
   const { data: session, status } = useSession();
   const pathname = usePathname();
+  const router = useRouter();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // Check membership expiry and redirect if necessary
+  useEffect(() => {
+    if (status === 'authenticated' && session?.user) {
+      // Allow access to payment history page
+      if (pathname === '/members-portal/payment-history') {
+        return;
+      }
+      
+      // Check if membership is expired
+      if (session.user.isMembershipActive === false) {
+        router.push('/members-portal/payment-history?expired=true');
+      }
+    }
+  }, [status, session, pathname, router]);
 
   // Navigation items for the member portal
   const navItems = [
