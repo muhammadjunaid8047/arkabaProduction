@@ -54,7 +54,7 @@ function MembershipRenewalContent() {
         const today = new Date();
         if (expiryDate > today) {
           // Member is not expired, redirect to payment history
-          router.push('/payment-history');
+          router.push('/members-portal/payment-history');
           return;
         }
       }
@@ -218,7 +218,7 @@ function MembershipRenewalContent() {
         >
           <div className="flex items-center gap-4 mb-6">
             <button
-              onClick={() => router.push('/payment-history')}
+              onClick={() => router.push('/members-portal/payment-history')}
               className="inline-flex items-center text-gray-600 hover:text-gray-900 transition-colors"
             >
               <ArrowLeft className="h-5 w-5 mr-2" />
