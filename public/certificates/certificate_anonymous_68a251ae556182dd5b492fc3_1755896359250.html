@@ -1,0 +1,346 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=800, initial-scale=1.0">
+    <title>Continuing Education Certificate - Data Entry Operator at connectcareeronline</title>
+    <style>
+        body {
+            font-family: 'Georgia', serif;
+            margin: 0;
+            padding: 10px;
+            background: white;
+            color: #333;
+            min-height: 100vh;
+            page-break-inside: avoid;
+            break-inside: avoid;
+        }
+        .certificate {
+            width: 650px;
+            max-width: 650px;
+            background: white;
+            border: 2px solid #1e40af;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+            margin: 0 auto;
+            page-break-inside: avoid;
+            break-inside: avoid;
+        }
+        .certificate::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 8px;
+            background: linear-gradient(90deg, #1e40af, #3b82f6, #60a5fa);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #1e40af;
+            padding-bottom: 15px;
+            position: relative;
+        }
+        .main-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 6px;
+            color: #1e40af;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .provider-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            font-size: 16px;
+            color: #374151;
+        }
+        .section {
+            margin-bottom: 15px;
+            background: #f8fafc;
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 3px solid #3b82f6;
+            overflow: hidden;
+        }
+        .section-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            text-align: center;
+            background: #1e40af;
+            color: white;
+            padding: 8px;
+            border-radius: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .field-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+        .field {
+            flex: 1;
+            min-width: 0;
+        }
+        .compact-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+        .compact-field {
+            min-width: 0;
+        }
+        .field-label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: block;
+            color: #1e40af;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        .field-value {
+            border: 1px solid #e5e7eb;
+            padding: 8px;
+            background: white;
+            min-height: 18px;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #374151;
+            overflow-y: auto;
+            max-height: 60px;
+        }
+        .single-field {
+            margin-bottom: 10px;
+        }
+        .signature-section {
+            margin-top: 20px;
+            border-top: 2px solid #d1d5db;
+            padding-top: 15px;
+        }
+        .signature-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+        .signature-field {
+            flex: 2;
+            min-width: 0;
+        }
+        .date-field {
+            flex: 1;
+            min-width: 0;
+        }
+        .score-section {
+            margin-top: 20px;
+            text-align: center;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            padding: 18px;
+            border-radius: 10px;
+            border: 2px solid #0ea5e9;
+            overflow: hidden;
+        }
+        .score-text {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #0c4a6e;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .status-passed {
+            background: #dcfce7;
+            color: #166534;
+            border: 2px solid #22c55e;
+        }
+        .status-failed {
+            background: #fef2f2;
+            color: #991b1b;
+            border: 2px solid #ef4444;
+        }
+        .watermark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            font-size: 80px;
+            color: rgba(59, 130, 246, 0.08);
+            font-weight: bold;
+            pointer-events: none;
+            z-index: 1;
+        }
+        .content {
+            position: relative;
+            z-index: 2;
+        }
+        .certificate-id {
+            position: absolute;
+            bottom: 10px;
+            right: 20px;
+            font-size: 10px;
+            color: #9ca3af;
+        }
+        
+        /* PDF-specific optimizations */
+        @media print {
+            .certificate {
+                width: 100% !important;
+                max-width: 100% !important;
+                padding: 20px !important;
+                margin: 0 !important;
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+            }
+            body {
+                padding: 10px !important;
+            }
+        }
+
+
+    </style>
+</head>
+<body>
+    <div class="certificate">
+        <div class="watermark">CEU</div>
+        <div class="content">
+            <div class="header">
+                <div class="main-title">Continuing Education Certificate</div>
+                <div class="provider-info">
+                    <div>Arkansas Association of Behavior Analysis</div>
+                    <div>🎓</div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">Participant Information</div>
+                <div class="field-row">
+                    <div class="field">
+                        <label class="field-label">Participant Name</label>
+                        <div class="field-value">Faraz Alam</div>
+                    </div>
+                    <div class="field">
+                        <label class="field-label">User Email</label>
+                        <div class="field-value">board@arkaba.org</div>
+                    </div>
+                </div>
+                <div class="field-row">
+                    <div class="field">
+                        <label class="field-label">BACB Certification Number</label>
+                        <div class="field-value">54</div>
+                    </div>
+                    <div class="field">
+                        <label class="field-label">Completion Date</label>
+                        <div class="field-value">August 23, 2025</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">Course Information</div>
+                <div class="single-field">
+                    <label class="field-label">Course Title</label>
+                    <div class="field-value">Data Entry Operator at connectcareeronline</div>
+                </div>
+                <div class="field-row">
+                    <div class="field">
+                        <label class="field-label">Content Type</label>
+                        <div class="field-value">video</div>
+                    </div>
+                    <div class="field">
+                        <label class="field-label">Duration</label>
+                        <div class="field-value">Self-paced</div>
+                    </div>
+                </div>
+                <div class="compact-row">
+                    <div class="compact-field">
+                        <label class="field-label">Total CEUs</label>
+                        <div class="field-value">1.1</div>
+                    </div>
+                    <div class="compact-field">
+                        <label class="field-label">Ethics CEUs</label>
+                        <div class="field-value">78</div>
+                    </div>
+                    <div class="compact-field">
+                        <label class="field-label">Supervision CEUs</label>
+                        <div class="field-value">4</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">Instructor & Coordinator Information</div>
+                <div class="field-row">
+                    <div class="field">
+                        <label class="field-label">Instructor Name</label>
+                        <div class="field-value">342</div>
+                    </div>
+                    <div class="field">
+                        <label class="field-label">ACE Coordinator</label>
+                        <div class="field-value">7656</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">ACE Provider Information</div>
+                <div class="field-row">
+                    <div class="field">
+                        <label class="field-label">Provider Name</label>
+                        <div class="field-value">Arkansas Association of Behavior Analysis</div>
+                    </div>
+                    <div class="field">
+                        <label class="field-label">Provider Number</label>
+                        <div class="field-value">47</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="signature-section">
+                <div class="signature-row">
+                    <div class="signature-field">
+                        <label class="field-label">ACE Provider Signature</label>
+                        <div class="field-value">_________________________</div>
+                    </div>
+                    <div class="date-field">
+                        <label class="field-label">Date</label>
+                        <div class="field-value">August 23, 2025</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="score-section">
+                <div class="score-text">
+                    <strong>Quiz Score: 5/5 (100%)</strong>
+                </div>
+                <div class="status-badge status-passed">
+                    ✅ PASSED
+                </div>
+                <p style="margin-top: 10px; font-size: 12px; color: #6b7280;">
+                    This certificate confirms successful completion of the course requirements.
+                </p>
+            </div>
+            
+            <div class="certificate-id">
+                Certificate ID: anonymous_68a251ae556182dd5b492fc3_1755896359250
+            </div>
+        </div>
+    </div>
+</body>
+</html>

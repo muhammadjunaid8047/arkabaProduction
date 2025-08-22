@@ -238,7 +238,7 @@ export default function MembersPage() {
         isAdmin: false,
       });
       
-      // Clear any error messages
+              // Clear any error messages
       setError('');
       
       setActivePage(1);

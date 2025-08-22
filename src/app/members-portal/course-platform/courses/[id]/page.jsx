@@ -277,23 +277,7 @@ export default function CoursePage() {
                   className="h-4 w-4 text-indigo-600"
                 />
                 <label>{opt}</label>
-                {submitted && (
-                  <span
-                    className={`ml-2 ${
-                      opt === q.correctAnswer
-                        ? "text-green-500"
-                        : answers[index] === opt
-                        ? "text-red-500"
-                        : "text-gray-500"
-                    }`}
-                  >
-                    {opt === q.correctAnswer
-                      ? "✓ Correct"
-                      : answers[index] === opt
-                      ? "✗ Incorrect"
-                      : ""}
-                  </span>
-                )}
+                {/* Correct/incorrect feedback removed - only admins can see this information */}
               </li>
             ))}
           </ul>
