@@ -562,3 +562,378 @@ The ArkABA Team
     return { success: false, error: error.message };
   }
 };
+
+// Contact Form Email Functions
+export const sendContactFormEmails = async (contactData) => {
+  try {
+    const { firstName, lastName, email, message, isArkansasSupervisor } = contactData;
+    
+    // Send confirmation email to user
+    const userEmailResult = await sendContactConfirmationToUser({
+      firstName,
+      lastName,
+      email
+    });
+    
+    // Send notification email to admin
+    const adminEmailResult = await sendContactNotificationToAdmin({
+      firstName,
+      lastName,
+      email,
+      message,
+      isArkansasSupervisor
+    });
+    
+    return {
+      success: userEmailResult.success && adminEmailResult.success,
+      userEmail: userEmailResult,
+      adminEmail: adminEmailResult
+    };
+  } catch (error) {
+    console.error("Error sending contact form emails:", error);
+    return { success: false, error: error.message };
+  }
+};
+
+export const sendContactConfirmationToUser = async ({ firstName, lastName, email }) => {
+  try {
+    const subject = "Thank you for contacting ArkABA";
+    
+    const html = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px;">
+        <div style="text-align: center; margin-bottom: 30px;">
+          <h1 style="color: #dc2626; margin: 0;">Thank You for Contacting Us!</h1>
+          <p style="color: #666; font-size: 16px;">We've received your message and will get back to you shortly.</p>
+        </div>
+        
+        <div style="background-color: #fef2f2; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+          <h2 style="color: #dc2626; margin-top: 0;">Hello ${firstName} ${lastName},</h2>
+          <p style="margin: 10px 0; color: #374151;">Thank you for reaching out to ArkABA. We have successfully received your contact form submission.</p>
+          <p style="margin: 10px 0; color: #374151;">Our team will review your message and respond to you within 1-2 business days.</p>
+        </div>
+        
+        <div style="background-color: #f0f9ff; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+          <h3 style="color: #1e40af; margin-top: 0;">What happens next?</h3>
+          <ul style="color: #374151; margin: 10px 0;">
+            <li>Our team will review your inquiry</li>
+            <li>We'll respond to your message within 1-2 business days</li>
+            <li>If urgent, please call us directly</li>
+          </ul>
+        </div>
+        
+        <div style="text-align: center; margin-top: 30px;">
+          <p style="color: #666;">If you have any urgent questions, please don't hesitate to contact us directly.</p>
+          <p style="color: #666; font-size: 14px;">Email: support@arkaba.org</p>
+        </div>
+        
+        <div style="text-align: center; margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee;">
+          <p style="color: #999; font-size: 12px;">Best regards,<br>The ArkABA Team</p>
+        </div>
+      </div>
+    `;
+
+    const text = `
+Thank you for contacting ArkABA!
+
+Hello ${firstName} ${lastName},
+
+Thank you for reaching out to ArkABA. We have successfully received your contact form submission.
+
+Our team will review your message and respond to you within 1-2 business days.
+
+What happens next?
+- Our team will review your inquiry
+- We'll respond to your message within 1-2 business days
+- If urgent, please call us directly
+
+If you have any urgent questions, please don't hesitate to contact us directly.
+Email: support@arkaba.org
+
+Best regards,
+The ArkABA Team
+    `;
+    
+    await transporter.sendMail({
+      from: `"ArkABA Support" <${process.env.EMAIL_USER}>`,
+      to: email,
+      subject: subject,
+      html: html,
+      text: text,
+    });
+    
+    return { success: true };
+  } catch (error) {
+    console.error("Error sending contact confirmation email:", error);
+    return { success: false, error: error.message };
+  }
+};
+
+export const sendContactNotificationToAdmin = async ({ firstName, lastName, email, message, isArkansasSupervisor }) => {
+  try {
+    const subject = `New Contact Form Submission from ${firstName} ${lastName}`;
+    
+    const html = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px;">
+        <div style="text-align: center; margin-bottom: 30px;">
+          <h1 style="color: #dc2626; margin: 0;">New Contact Form Submission</h1>
+          <p style="color: #666; font-size: 16px;">You have received a new message through the contact form.</p>
+        </div>
+        
+        <div style="background-color: #fef2f2; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+          <h2 style="color: #dc2626; margin-top: 0;">Contact Details</h2>
+          <p style="margin: 10px 0;"><strong>Name:</strong> ${firstName} ${lastName}</p>
+          <p style="margin: 10px 0;"><strong>Email:</strong> ${email}</p>
+          <p style="margin: 10px 0;"><strong>Arkansas Supervisor:</strong> ${isArkansasSupervisor ? 'Yes' : 'No'}</p>
+          <p style="margin: 10px 0;"><strong>Submitted:</strong> ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}</p>
+        </div>
+        
+        <div style="background-color: #f9fafb; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+          <h3 style="color: #374151; margin-top: 0;">Message:</h3>
+          <p style="color: #374151; line-height: 1.6; white-space: pre-wrap;">${message}</p>
+        </div>
+        
+        <div style="text-align: center; margin-top: 30px;">
+          <p style="color: #666; font-size: 14px;">Please respond to this inquiry within 1-2 business days.</p>
+        </div>
+        
+        <div style="text-align: center; margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee;">
+          <p style="color: #999; font-size: 12px;">ArkABA Contact Form System</p>
+        </div>
+      </div>
+    `;
+
+    const text = `
+NEW CONTACT FORM SUBMISSION
+
+Contact Details:
+Name: ${firstName} ${lastName}
+Email: ${email}
+Arkansas Supervisor: ${isArkansasSupervisor ? 'Yes' : 'No'}
+Submitted: ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}
+
+Message:
+${message}
+
+Please respond to this inquiry within 1-2 business days.
+
+ArkABA Contact Form System
+    `;
+    
+    // Send to admin email - you'll need to define this in your environment variables
+    const adminEmail = process.env.ADMIN_EMAIL || process.env.EMAIL_USER;
+    
+    await transporter.sendMail({
+      from: `"ArkABA Contact Form" <${process.env.EMAIL_USER}>`,
+      to: adminEmail,
+      subject: subject,
+      html: html,
+      text: text,
+    });
+    
+    return { success: true };
+  } catch (error) {
+    console.error("Error sending contact admin notification email:", error);
+    return { success: false, error: error.message };
+  }
+};
+
+// Get Involved Form Email Functions
+export const sendGetInvolvedFormEmails = async (getInvolvedData) => {
+  try {
+    const { firstName, lastName, email, joinCommittee, planEvents, offerCEU, supportAdvocacy, otherInterest } = getInvolvedData;
+    
+    // Send confirmation email to user
+    const userEmailResult = await sendGetInvolvedConfirmationToUser({
+      firstName,
+      lastName,
+      email
+    });
+    
+    // Send notification email to admin
+    const adminEmailResult = await sendGetInvolvedNotificationToAdmin({
+      firstName,
+      lastName,
+      email,
+      joinCommittee,
+      planEvents,
+      offerCEU,
+      supportAdvocacy,
+      otherInterest
+    });
+    
+    return {
+      success: userEmailResult.success && adminEmailResult.success,
+      userEmail: userEmailResult,
+      adminEmail: adminEmailResult
+    };
+  } catch (error) {
+    console.error("Error sending get involved form emails:", error);
+    return { success: false, error: error.message };
+  }
+};
+
+export const sendGetInvolvedConfirmationToUser = async ({ firstName, lastName, email }) => {
+  try {
+    const subject = "Thank you for your interest in getting involved with ArkABA!";
+    
+    const html = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px;">
+        <div style="text-align: center; margin-bottom: 30px;">
+          <h1 style="color: #dc2626; margin: 0;">Thank You for Your Interest!</h1>
+          <p style="color: #666; font-size: 16px;">We're excited about your willingness to get involved with ArkABA.</p>
+        </div>
+        
+        <div style="background-color: #fef2f2; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+          <h2 style="color: #dc2626; margin-top: 0;">Hello ${firstName} ${lastName},</h2>
+          <p style="margin: 10px 0; color: #374151;">Thank you for submitting your "Get Involved" form. We greatly appreciate your willingness to contribute to our organization.</p>
+          <p style="margin: 10px 0; color: #374151;">Our volunteer coordinator will review your interests and reach out to you with opportunities that match your availability and skills.</p>
+        </div>
+        
+        <div style="background-color: #f0f9ff; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+          <h3 style="color: #1e40af; margin-top: 0;">What happens next?</h3>
+          <ul style="color: #374151; margin: 10px 0;">
+            <li>Our volunteer coordinator will review your submission</li>
+            <li>We'll match your interests with available opportunities</li>
+            <li>You'll hear from us within 3-5 business days</li>
+            <li>We'll provide details about volunteer opportunities that fit your interests</li>
+          </ul>
+        </div>
+        
+        <div style="text-align: center; margin-top: 30px;">
+          <p style="color: #666;">Thank you for your commitment to advancing our profession!</p>
+          <p style="color: #666; font-size: 14px;">Email: support@arkaba.org</p>
+        </div>
+        
+        <div style="text-align: center; margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee;">
+          <p style="color: #999; font-size: 12px;">Best regards,<br>The ArkABA Team</p>
+        </div>
+      </div>
+    `;
+
+    const text = `
+Thank you for your interest in getting involved with ArkABA!
+
+Hello ${firstName} ${lastName},
+
+Thank you for submitting your "Get Involved" form. We greatly appreciate your willingness to contribute to our organization.
+
+Our volunteer coordinator will review your interests and reach out to you with opportunities that match your availability and skills.
+
+What happens next?
+- Our volunteer coordinator will review your submission
+- We'll match your interests with available opportunities
+- You'll hear from us within 3-5 business days
+- We'll provide details about volunteer opportunities that fit your interests
+
+Thank you for your commitment to advancing our profession!
+
+Email: support@arkaba.org
+
+Best regards,
+The ArkABA Team
+    `;
+    
+    await transporter.sendMail({
+      from: `"ArkABA Volunteer Team" <${process.env.EMAIL_USER}>`,
+      to: email,
+      subject: subject,
+      html: html,
+      text: text,
+    });
+    
+    return { success: true };
+  } catch (error) {
+    console.error("Error sending get involved confirmation email:", error);
+    return { success: false, error: error.message };
+  }
+};
+
+export const sendGetInvolvedNotificationToAdmin = async ({ firstName, lastName, email, joinCommittee, planEvents, offerCEU, supportAdvocacy, otherInterest }) => {
+  try {
+    const subject = `New Get Involved Submission from ${firstName} ${lastName}`;
+    
+    // Create interests list
+    const interests = [];
+    if (joinCommittee) interests.push('Join a Committee');
+    if (planEvents) interests.push('Plan Events');
+    if (offerCEU) interests.push('Offer CEU Training');
+    if (supportAdvocacy) interests.push('Support Advocacy');
+    
+    const html = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px;">
+        <div style="text-align: center; margin-bottom: 30px;">
+          <h1 style="color: #dc2626; margin: 0;">New Get Involved Submission</h1>
+          <p style="color: #666; font-size: 16px;">Someone wants to volunteer with ArkABA!</p>
+        </div>
+        
+        <div style="background-color: #fef2f2; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+          <h2 style="color: #dc2626; margin-top: 0;">Volunteer Details</h2>
+          <p style="margin: 10px 0;"><strong>Name:</strong> ${firstName} ${lastName}</p>
+          <p style="margin: 10px 0;"><strong>Email:</strong> ${email}</p>
+          <p style="margin: 10px 0;"><strong>Submitted:</strong> ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}</p>
+        </div>
+        
+        <div style="background-color: #f0f9ff; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+          <h3 style="color: #1e40af; margin-top: 0;">Areas of Interest:</h3>
+          ${interests.length > 0 ? `
+            <ul style="color: #374151; margin: 10px 0;">
+              ${interests.map(interest => `<li>${interest}</li>`).join('')}
+            </ul>
+          ` : '<p style="color: #6b7280;">No specific areas selected</p>'}
+        </div>
+        
+        ${otherInterest ? `
+          <div style="background-color: #f9fafb; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3 style="color: #374151; margin-top: 0;">Other Interests:</h3>
+            <p style="color: #374151; line-height: 1.6;">${otherInterest}</p>
+          </div>
+        ` : ''}
+        
+        <div style="text-align: center; margin-top: 30px;">
+          <p style="color: #666; font-size: 14px;">Please follow up with this volunteer within 3-5 business days.</p>
+        </div>
+        
+        <div style="text-align: center; margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee;">
+          <p style="color: #999; font-size: 12px;">ArkABA Get Involved Form System</p>
+        </div>
+      </div>
+    `;
+
+    const text = `
+NEW GET INVOLVED SUBMISSION
+
+Volunteer Details:
+Name: ${firstName} ${lastName}
+Email: ${email}
+Submitted: ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}
+
+Areas of Interest:
+${interests.length > 0 ? interests.map(interest => `- ${interest}`).join('\n') : '- No specific areas selected'}
+
+${otherInterest ? `
+Other Interests:
+${otherInterest}
+` : ''}
+
+Please follow up with this volunteer within 3-5 business days.
+
+ArkABA Get Involved Form System
+    `;
+    
+    // Send to admin email - you'll need to define this in your environment variables
+    const adminEmail = process.env.ADMIN_EMAIL || process.env.EMAIL_USER;
+    
+    await transporter.sendMail({
+      from: `"ArkABA Get Involved Form" <${process.env.EMAIL_USER}>`,
+      to: adminEmail,
+      subject: subject,
+      html: html,
+      text: text,
+    });
+    
+    return { success: true };
+  } catch (error) {
+    console.error("Error sending get involved admin notification email:", error);
+    return { success: false, error: error.message };
+  }
+};

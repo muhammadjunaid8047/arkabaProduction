@@ -2,6 +2,7 @@
 
 import { connect } from "@/lib/mongodb/mongoose";
 import Contact from "@/lib/models/contact.model";
+import { sendContactFormEmails } from "@/lib/services/emailService";
 
 export async function POST(req) {
   try {
@@ -17,6 +18,7 @@ export async function POST(req) {
 
     await connect();
 
+    // Save contact form submission to database
     await Contact.create({
       firstName,
       lastName,
@@ -24,6 +26,26 @@ export async function POST(req) {
       message,
       isArkansasSupervisor: Boolean(isArkansasSupervisor),
     });
+
+    // Send emails to user and admin
+    const emailResult = await sendContactFormEmails({
+      firstName,
+      lastName,
+      email,
+      message,
+      isArkansasSupervisor: Boolean(isArkansasSupervisor),
+    });
+
+    if (!emailResult.success) {
+      console.error("Email sending failed:", emailResult);
+      // Still return success for form submission even if email fails
+      return new Response(
+        JSON.stringify({ 
+          message: "Form submitted successfully, but there was an issue sending confirmation emails" 
+        }),
+        { status: 200 }
+      );
+    }
 
     return new Response(
       JSON.stringify({ message: "Form submitted successfully" }),
