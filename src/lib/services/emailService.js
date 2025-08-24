@@ -258,7 +258,7 @@ export const sendEventRegistrationConfirmation = async (registration) => {
               </div>
               
               <div style="text-align: center; margin: 30px 0;">
-                  <a href="${process.env.NEXT_PUBLIC_SITE_URL || 'https://emergitechdev.in/'}/api/registrations/receipt/${registration._id}" 
+                  <a href="${process.env.NEXT_PUBLIC_SITE_URL || 'https://arkaba.org/'}/api/registrations/receipt/${registration._id}" 
                      class="cta-button">
                       Download Receipt
                   </a>
@@ -318,7 +318,7 @@ IMPORTANT:
 - Bring this confirmation or receipt to the event
 - For questions, contact us at support@arkaba.org
 
-Download your receipt: ${process.env.NEXT_PUBLIC_SITE_URL || 'https://emergitechdev.in/'}/api/registrations/receipt/${registration._id}
+Download your receipt: ${process.env.NEXT_PUBLIC_SITE_URL || 'https://arkaba.org/'}/api/registrations/receipt/${registration._id}
 
 Thank you for choosing ArkABA!
 

@@ -21,7 +21,7 @@ export async function POST(req) {
   user.resetTokenExpiry = expires;
   await user.save();
 
-  const resetUrl = `http://https://emergitechdev.in//reset-password?token=${token}`;
+  const resetUrl = `http://https://arkaba.org//reset-password?token=${token}`;
 
   // Setup mail transport
   const transporter = nodemailer.createTransport({

@@ -7,7 +7,7 @@ import { marked } from "marked";
 
 async function getBlog(id) {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'https://emergitechdev.in/'}/api/blogs/${id}`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'https://arkaba.org/'}/api/blogs/${id}`, {
       cache: "no-store",
     });
     
