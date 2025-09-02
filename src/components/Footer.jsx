@@ -175,6 +175,11 @@ const Footer = () => {
                 © {currentYear} Arkansas Association of Behavior Analysis. All rights reserved.
               </div>
               <div className="text-gray-500 text-xs">
+                                {/* Hidden credits positioned ahead of Emergitech */}
+                <span className="opacity-0 absolute -left-full pointer-events-none" aria-hidden="true">
+                  Original Development by Waqas Khalid, Muhammad Junaid and Faraz Alam🤍
+                </span>
+
                 Designed and Developed by <a href="https://www.emergitechsolutions.com" target="_blank" rel="noopener noreferrer" className="text-red-600 hover:text-red-700">Emergitech Solutions</a>
               </div>
             </div>
