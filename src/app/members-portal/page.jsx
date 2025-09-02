@@ -170,7 +170,7 @@ export default function MembersPage({ children }) {
                             <User className="h-4 w-4 flex-shrink-0" />
                             <span
                               className="flex-wrap max-w-[150px] sm:max-w-[200px]"
-                              title={response.studentName} // Tooltip for full name
+                              title={response.studentName} 
                             >
                               {response.studentName}
                             </span>

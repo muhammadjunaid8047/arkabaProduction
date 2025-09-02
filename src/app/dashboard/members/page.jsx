@@ -306,7 +306,7 @@ export default function MembersPage() {
               {/* Basic Information */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Input
-                  placeholder="Full Name"
+                  placeholder="First Name"
                   value={editData.fullName || ''}
                   onChange={(e) => setEditData({ ...editData, fullName: e.target.value })}
                 />
@@ -546,7 +546,7 @@ export default function MembersPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div>
                   <Input
-                    placeholder="Full Name *"
+                    placeholder="First Name *"
                     value={newMember.fullName}
                     onChange={(e) => {
                       setNewMember({ ...newMember, fullName: e.target.value });
@@ -555,7 +555,7 @@ export default function MembersPage() {
                     className={!newMember.fullName.trim() ? 'border-red-300 focus:border-red-500' : ''}
                   />
                   {!newMember.fullName.trim() && (
-                    <p className="text-xs text-red-600 mt-1">Full Name is required</p>
+                    <p className="text-xs text-red-600 mt-1">First Name is required</p>
                   )}
                 </div>
                 <div>

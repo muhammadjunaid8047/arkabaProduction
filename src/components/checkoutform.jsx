@@ -125,7 +125,7 @@ export default function CheckoutForm({ form, setMsg, isFormValid, validateForm }
 
       {!formIsValid && (
         <div className="bg-red-100 text-red-700 p-3 rounded text-sm">
-          ⚠️ Please fill all required fields: Full Name, Last Name, Email, Password, Billing Name, and Billing Address.
+          ⚠️ Please fill all required fields: First Name, Last Name, Email, Password, Billing Name, and Billing Address.
         </div>
       )}
 

@@ -4,7 +4,7 @@ import Link from "next/link";
 import BlogImage from "@/components/BlogImage";
 
 async function getBlogs() {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'https://arkaba.org/'}/api/blogs`, {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'https://www.arkaba.org/'}/api/blogs`, {
     cache: "no-store",
   });
   return res.json();

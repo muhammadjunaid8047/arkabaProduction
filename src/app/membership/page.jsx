@@ -190,7 +190,7 @@ export default function MembershipPage() {
     const errors = {};
     
     // Required fields validation
-    if (!form.fullName?.trim()) errors.fullName = "Full name is required";
+    if (!form.fullName?.trim()) errors.fullName = "First name is required";
     if (!form.lastName?.trim()) errors.lastName = "Last name is required";
     if (!form.email?.trim()) errors.email = "Email is required";
     if (!form.password?.trim()) errors.password = "Password is required";
@@ -527,7 +527,7 @@ export default function MembershipPage() {
            </div>
 
            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-             <Input label="Full Name" name="fullName" value={form.fullName} onChange={handleChange} required icon={<User className="h-4 w-4" />} error={formErrors.fullName} />
+             <Input label="First Name" name="fullName" value={form.fullName} onChange={handleChange} required icon={<User className="h-4 w-4" />} error={formErrors.fullName} />
              <Input label="Last Name" name="lastName" value={form.lastName} onChange={handleChange} required icon={<User className="h-4 w-4" />} error={formErrors.lastName} />
              <Input label="Email" type="email" name="email" value={form.email} onChange={handleChange} required icon={<Mail className="h-4 w-4" />} error={formErrors.email} />
              <Input label="Phone" name="phone" value={form.phone} onChange={handleChange} icon={<Phone className="h-4 w-4" />} />

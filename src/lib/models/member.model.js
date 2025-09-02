@@ -74,7 +74,7 @@ memberSchema.index({ stripeCustomerId: 1 });
 memberSchema.index({ membershipStatus: 1 });
 memberSchema.index({ membershipExpiry: 1 });
 
-// Virtual for full name
+
 memberSchema.virtual('fullNameComplete').get(function() {
   return `${this.fullName} ${this.lastName}`.trim();
 });
