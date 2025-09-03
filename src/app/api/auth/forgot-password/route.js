@@ -21,7 +21,7 @@ export async function POST(req) {
   user.resetTokenExpiry = expires;
   await user.save();
 
-  const resetUrl = `http://https://arkaba.org//reset-password?token=${token}`;
+  const resetUrl = `https://arkaba.org//reset-password?token=${token}`;
 
   // Setup mail transport
   const transporter = nodemailer.createTransport({
